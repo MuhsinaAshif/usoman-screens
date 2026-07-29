@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>United Securities — Admin Portal Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Guntur:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --navy: #00325d;
+      --navy-deep: #001a33;
+      --navy-mid: #0a3d6e;
+      --gold: #fab802;
+      --gold-dark: #c89a2a;
+      --bg: #f0f3f6;
+      --white: #fff;
+      --line: #e2e8f0;
+      --muted: #64748b;
+      --ink: #1e293b;
+      --ok: #159947;
+      --warn: #d97706;
+      --danger: #dc2626;
+      --side-w: 260px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Hind Guntur", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .app { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--side-w);
+      background: linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+      color: rgba(255,255,255,0.82);
+      display: flex; flex-direction: column;
+      position: fixed; inset: 0 auto 0 0; z-index: 20;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 20px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand .mark {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: #231f20; color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 20px;
+      border: 1px solid rgba(250,184,2,0.45);
+    }
+    .brand strong { display: block; color: #fff; font-size: 13px; line-height: 1.25; }
+    .brand span { font-size: 10px; color: rgba(255,255,255,0.55); }
+    .nav { padding: 14px 10px; flex: 1; overflow: auto; }
+    .nav button {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      background: transparent; border: 0; color: inherit;
+      padding: 11px 12px; border-radius: 10px; cursor: pointer;
+      font: inherit; font-size: 13.5px; text-align: left; margin-bottom: 2px;
+    }
+    .nav button:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav button.active {
+      background: rgba(250,184,2,0.14); color: var(--gold); font-weight: 600;
+    }
+    .nav button .ico { width: 20px; text-align: center; opacity: 0.9; }
+    .nav button .dot {
+      margin-left: auto; width: 8px; height: 8px; border-radius: 50%;
+      background: #f59e0b;
+    }
+    .side-card {
+      margin: 10px 14px 18px; padding: 12px;
+      border: 1px solid rgba(250,184,2,0.35);
+      border-radius: 10px; font-size: 11px; line-height: 1.4;
+      color: rgba(255,255,255,0.75);
+    }
+    .side-card strong { color: var(--gold); display: block; margin-bottom: 4px; }
+
+    /* Main */
+    .main { margin-left: var(--side-w); flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .topbar {
+      background: var(--white); border-bottom: 1px solid var(--line);
+      padding: 12px 22px; display: flex; align-items: center; gap: 14px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .search {
+      flex: 1; max-width: 520px; display: flex; align-items: center; gap: 8px;
+      background: #f8fafc; border: 1px solid var(--line); border-radius: 10px;
+      padding: 9px 12px; color: var(--muted); font-size: 13px;
+    }
+    .search input {
+      border: 0; background: transparent; outline: none; width: 100%;
+      font: inherit; color: var(--ink);
+    }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .lang {
+      display: flex; gap: 4px; background: #f8fafc; border: 1px solid var(--line);
+      border-radius: 20px; padding: 3px; font-size: 12px;
+    }
+    .lang b {
+      padding: 4px 10px; border-radius: 16px; cursor: pointer; font-weight: 600; color: var(--muted);
+    }
+    .lang b.on { background: var(--navy); color: #fff; }
+    .bell {
+      position: relative; width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+      background: #fff; cursor: pointer;
+    }
+    .bell em {
+      position: absolute; top: 4px; right: 4px; width: 16px; height: 16px;
+      background: #ef4444; color: #fff; border-radius: 50%; font-size: 9px;
+      display: flex; align-items: center; justify-content: center; font-style: normal; font-weight: 700;
+    }
+    .user {
+      display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+    }
+    .user .av {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--navy);
+      color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
+
+    .content { padding: 22px; flex: 1; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-h {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .page-h h1 { font-size: 22px; color: var(--navy); font-weight: 700; }
+    .page-h p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      border: 0; border-radius: 8px; padding: 9px 14px; font: inherit;
+      font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex;
+      align-items: center; gap: 6px;
+    }
+    .btn-gold { background: var(--gold); color: #231f20; }
+    .btn-navy { background: var(--navy); color: #fff; }
+    .btn-ghost { background: #fff; color: var(--navy); border: 1px solid var(--line); }
+    .btn:hover { filter: brightness(1.05); }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+    .kpi {
+      background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+      padding: 16px; box-shadow: 0 1px 2px rgba(0,50,93,0.04);
+    }
+    .kpi .l { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .kpi .v { font-size: 26px; font-weight: 700; color: var(--navy); margin: 6px 0 4px; }
+    .kpi .t { font-size: 12px; font-weight: 600; }
+    .kpi .t.up { color: var(--ok); }
+    .kpi .t.down { color: var(--ok); }
+    .kpi .t.gold { color: var(--gold-dark); }
+
+    .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
+    .card {
+      background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+      padding: 16px; box-shadow: 0 1px 2px rgba(0,50,93,0.04);
+    }
+    .card h3 { font-size: 15px; color: var(--navy); margin-bottom: 12px; font-weight: 700; }
+    .card .link { font-size: 12px; color: var(--navy); font-weight: 600; text-decoration: none; }
+    .card .link:hover { color: var(--gold-dark); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th {
+      text-align: left; color: var(--muted); font-weight: 600; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.03em;
+      padding: 8px 8px; border-bottom: 1px solid var(--line);
+    }
+    td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: #f8fafc; }
+    tr.selected td { background: #fff8e1; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+    .pill::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    }
+    .pill.ok { background: #ecfdf5; color: var(--ok); }
+    .pill.warn { background: #fff7ed; color: var(--warn); }
+    .pill.danger { background: #fef2f2; color: var(--danger); }
+    .pill.muted { background: #f1f5f9; color: #64748b; }
+    .pill.navy { background: #e8eef5; color: var(--navy); }
+
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+      background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 12px;
+    }
+    .filters input, .filters select {
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+      font: inherit; font-size: 13px; background: #fff; color: var(--ink);
+    }
+    .seg {
+      display: inline-flex; background: #f1f5f9; border-radius: 8px; padding: 3px;
+    }
+    .seg button {
+      border: 0; background: transparent; padding: 7px 12px; border-radius: 6px;
+      font: inherit; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer;
+    }
+    .seg button.on { background: var(--navy); color: #fff; }
+
+    .invest-layout { display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
+    .detail {
+      background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+      padding: 16px; position: sticky; top: 76px; max-height: calc(100vh - 100px); overflow: auto;
+    }
+    .detail h3 { font-size: 16px; color: var(--navy); margin-bottom: 4px; }
+    .detail .sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+    .kv span { color: var(--muted); }
+    .kv b { color: var(--ink); font-weight: 600; text-align: right; }
+    .section-label {
+      margin: 14px 0 8px; font-size: 12px; font-weight: 700; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .note-box {
+      background: #fff8e1; border: 1px solid #fde68a; border-radius: 10px;
+      padding: 10px; font-size: 12px; color: #78350f; margin-top: 10px; line-height: 1.4;
+    }
+
+    .report-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .report-card {
+      background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+      padding: 16px;
+    }
+    .report-card h4 { font-size: 14px; color: var(--navy); margin: 8px 0 4px; }
+    .report-card p { font-size: 12px; color: var(--muted); margin-bottom: 12px; min-height: 34px; }
+    .report-card .icon {
+      width: 36px; height: 36px; border-radius: 10px; background: #e8eef5;
+      display: flex; align-items: center; justify-content: center; color: var(--navy); font-size: 16px;
+    }
+    .report-actions { display: flex; gap: 6px; }
+    .report-actions .btn { padding: 6px 10px; font-size: 12px; }
+
+    .health-list { display: grid; gap: 10px; }
+    .health-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; background: #f8fafc; border-radius: 10px; font-size: 13px;
+    }
+    .dropzone {
+      border: 2px dashed var(--gold-dark); background: #fffdf5; border-radius: 12px;
+      padding: 28px; text-align: center; color: #78350f; margin-bottom: 14px; cursor: pointer;
+    }
+    .dropzone strong { display: block; color: var(--navy); margin-bottom: 4px; }
+    .toast {
+      position: fixed; right: 20px; bottom: 20px; background: var(--navy); color: #fff;
+      padding: 12px 16px; border-radius: 10px; font-size: 13px; z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; max-width: 320px;
+      border-left: 4px solid var(--gold);
+    }
+    .toast.show { display: block; }
+    .footer {
+      padding: 14px 22px; color: var(--muted); font-size: 12px;
+      display: flex; justify-content: space-between; border-top: 1px solid var(--line);
+      background: #fff;
+    }
+    .footer b { color: var(--gold-dark); font-weight: 600; }
+
+    .chart-box { position: relative; height: 220px; }
+    .status-rows { display: grid; gap: 10px; font-size: 13px; }
+    .status-rows .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+    .status-rows .row span { color: var(--muted); }
+
+    @media (max-width: 1100px) {
+      .kpis, .report-grid { grid-template-columns: 1fr 1fr; }
+      .grid-2, .grid-3, .invest-layout { grid-template-columns: 1fr; }
+      .detail { position: static; max-height: none; }
+    }
+    @media (max-width: 800px) {
+      .sidebar { transform: translateX(-100%); }
+      .main { margin-left: 0; }
+      .kpis { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">U</div>
+      <div>
+        <strong>UNITED SECURITIES</strong>
+        <span>Fund Management · Admin</span>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="active" data-page="dashboard"><span class="ico">▣</span> Dashboard</button>
+      <button data-page="investors"><span class="ico">☺</span> Investors</button>
+      <button data-page="transactions"><span class="ico">⇄</span> Transactions</button>
+      <button data-page="funds"><span class="ico">◆</span> Funds</button>
+      <button data-page="documents"><span class="ico">▤</span> Documents</button>
+      <button data-page="reports"><span class="ico">▥</span> Reports</button>
+      <button data-page="notifications"><span class="ico">🔔</span> Notifications<span class="dot"></span></button>
+      <button data-page="integration"><span class="ico">☁</span> Integration Health</button>
+      <button data-page="audit"><span class="ico">☰</span> Audit Logs</button>
+      <button data-page="settings"><span class="ico">⚙</span> Settings</button>
+    </nav>
+    <div class="side-card">
+      <strong>Gulf Custody is the golden source</strong>
+      Holdings, NAV, KYC approval and confirmations come from GCC. This portal is for ops, documents &amp; channel master data.
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="search">🔍 <input id="globalSearch" placeholder="Search investors, transactions, funds..." /></div>
+      <div class="top-actions">
+        <div class="lang"><b class="on" id="langEn">English</b><b id="langAr">العربية</b></div>
+        <div class="bell" title="Notifications">🔔<em>3</em></div>
+        <div class="user"><div class="av">OA</div> Operations Admin</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-h">
+          <div>
+            <h1>Operations Dashboard</h1>
+            <p>Live demo · United Securities investor funds · Muscat time</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost" onclick="toast('Dashboard refreshed (demo)')">↻ Refresh</button>
+            <button class="btn btn-navy" onclick="go('transactions')">View transactions</button>
+          </div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Total Investors</div><div class="v">12,486</div><div class="t up">↑ 6.2% vs yesterday</div></div>
+          <div class="kpi"><div class="l">KYC Pending at Gulf Custody</div><div class="v">184</div><div class="t down">↓ 8.7% vs yesterday</div></div>
+          <div class="kpi"><div class="l">Subscriptions Today</div><div class="v">OMR 248,750</div><div class="t up">↑ 12.4% vs yesterday</div></div>
+          <div class="kpi"><div class="l">Redemptions Today</div><div class="v" style="color:var(--gold-dark)">OMR 91,420</div><div class="t gold">↓ 5.1% vs yesterday</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Subscription vs Redemption Volume Trend</h3>
+            <div class="chart-box"><canvas id="trendChart"></canvas></div>
+          </div>
+          <div class="card">
+            <h3>Transactions by Status</h3>
+            <div class="chart-box"><canvas id="statusChart"></canvas></div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Recent Transactions</h3>
+            <table>
+              <thead><tr><th>Reference</th><th>Investor</th><th>Fund</th><th>Type</th><th>Amount</th><th>GCC Status</th></tr></thead>
+              <tbody id="dashTxBody"></tbody>
+            </table>
+            <div style="margin-top:10px"><a class="link" href="#" onclick="go('transactions');return false;">View all transactions →</a></div>
+          </div>
+          <div class="card">
+            <h3>Gulf Custody Integration Status</h3>
+            <div class="status-rows">
+              <div class="row"><span>Overall Status</span><b class="pill ok">Healthy</b></div>
+              <div class="row"><span>Last Sync Time</span><b>Today 14:02 MST</b></div>
+              <div class="row"><span>Pending Queue</span><b>23</b></div>
+              <div class="row"><span>Message Success</span><b>1,684</b></div>
+              <div class="row"><span>Message Failure</span><b>12</b></div>
+              <div class="row"><span>Uptime</span><b>99.98%</b></div>
+            </div>
+            <div style="margin-top:10px"><a class="link" href="#" onclick="go('integration');return false;">View integration health →</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVESTORS -->
+      <section class="page" id="page-investors">
+        <div class="page-h">
+          <div>
+            <h1>Investor Accounts</h1>
+            <p>View investors and custody status. KYC approve/reject stays with Gulf Custody.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost" onclick="toast('Exported investors CSV (demo)')">↓ Export</button>
+            <button class="btn btn-navy" onclick="toast('Refreshing investor data from GCC (demo)')">↻ Refresh from GCC</button>
+          </div>
+        </div>
+        <div class="filters">
+          <input id="invSearch" placeholder="Search (Mobile or Reference)" style="min-width:220px" />
+          <select id="invKyc"><option value="">KYC Status</option><option>Verified</option><option>Pending at Gulf Custody</option><option>Action Required</option></select>
+          <select id="invFund"><option value="">Fund</option><option>United GCC Fund</option><option>United US Markets Fund</option></select>
+          <select><option>Last 90 Days</option><option>Last 30 Days</option><option>YTD</option></select>
+        </div>
+        <div class="invest-layout">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="padding-left:16px">Investor</th><th>Mobile</th><th>Client Ref</th>
+                  <th>KYC</th><th>Account</th><th>Portfolio</th><th>Last GCC Sync</th>
+                </tr>
+              </thead>
+              <tbody id="invBody"></tbody>
+            </table>
+            <div style="padding:12px 16px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;">
+              <span id="invCount">Showing 1–5</span>
+              <span>Demo data · OMR</span>
+            </div>
+          </div>
+          <aside class="detail" id="invDetail"></aside>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="page" id="page-transactions">
+        <div class="page-h">
+          <div>
+            <h1>Transactions</h1>
+            <p>Subscriptions, redemptions and SIP — status from app + Gulf Custody.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost" onclick="toast('Transactions exported (demo)')">↓ Export</button>
+          </div>
+        </div>
+        <div class="filters">
+          <select id="txType"><option value="">All types</option><option>Subscription</option><option>Redemption</option><option>SIP</option></select>
+          <select id="txStatus"><option value="">All statuses</option><option>Processed</option><option>Pending at Gulf Custody</option><option>In Progress</option><option>Failed</option></select>
+          <select><option>All Funds</option><option>United GCC Fund</option><option>United US Markets Fund</option></select>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th style="padding-left:16px">Reference</th><th>Investor</th><th>Fund</th><th>Type</th><th>Amount (OMR)</th><th>Cut-off</th><th>GCC Status</th><th>Date</th></tr></thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FUNDS -->
+      <section class="page" id="page-funds">
+        <div class="page-h">
+          <div>
+            <h1>Funds Master</h1>
+            <p>Channel master data for mobile app. GCC fund codes from custody setup.</p>
+          </div>
+          <div class="actions"><button class="btn btn-gold" onclick="toast('Add fund form (demo)')">+ Add fund</button></div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th style="padding-left:16px">Code</th><th>Name</th><th>Currency</th><th>Risk</th><th>Min Sub</th><th>Cut-off</th><th>NAV</th><th>Status</th><th></th></tr></thead>
+            <tbody id="fundBody"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-top:14px;" id="fundEdit">
+          <h3>Edit fund master</h3>
+          <div class="filters" style="border:0;padding:0;background:transparent;">
+            <input id="fName" style="flex:1;min-width:180px" placeholder="Name EN" />
+            <input id="fNameAr" style="flex:1;min-width:180px" placeholder="Name AR" />
+            <input id="fCutoff" style="width:180px" placeholder="Cut-off" />
+            <input id="fMin" style="width:120px" placeholder="Min sub" />
+            <button class="btn btn-navy" onclick="saveFund()">Save master data</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOCUMENTS -->
+      <section class="page" id="page-documents">
+        <div class="page-h">
+          <div>
+            <h1>Documents</h1>
+            <p>Upload Factsheet, Prospectus, T&amp;Cs and risk disclosures for the investor app.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="filters" style="border:0;padding:0;background:transparent;margin-bottom:12px;">
+            <select id="docFund"><option>United GCC Fund (E71)</option><option>United US Markets Fund (E59)</option></select>
+            <select id="docType"><option>Factsheet</option><option>Prospectus</option><option>Terms &amp; Conditions</option><option>Risk disclosure</option></select>
+            <select><option>English</option><option>Arabic</option><option>Both</option></select>
+          </div>
+          <div class="dropzone" id="dropzone">
+            <strong>Drop PDF here or click to browse</strong>
+            Max 20 MB · PDF · Versioned on publish
+            <input type="file" id="docFile" accept=".pdf" style="display:none" />
+          </div>
+          <div class="actions" style="margin-bottom:14px;">
+            <button class="btn btn-gold" onclick="publishDoc()">Publish to app</button>
+            <button class="btn btn-ghost" onclick="toast('Saved as draft (demo)')">Save draft</button>
+          </div>
+          <table>
+            <thead><tr><th>Fund</th><th>Type</th><th>Version</th><th>Status</th><th></th></tr></thead>
+            <tbody id="docBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section class="page" id="page-reports">
+        <div class="page-h">
+          <div>
+            <h1>Reports &amp; Reconciliation</h1>
+            <p>Operational reports and GCC reconciliation summary.</p>
+          </div>
+        </div>
+        <div class="filters">
+          <select><option>01 Jul 2026 – 29 Jul 2026</option></select>
+          <select><option>All Funds</option><option>United GCC Fund</option><option>United US Markets Fund</option></select>
+          <div class="seg">
+            <button class="on" type="button">Consolidated</button>
+            <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">Fund-wise</button>
+          </div>
+        </div>
+        <div class="report-grid" id="reportGrid"></div>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Reconciliation summary</h3>
+            <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin:0;">
+              <div class="kpi"><div class="l">Matched</div><div class="v" style="font-size:22px;color:var(--ok)">98.7%</div></div>
+              <div class="kpi"><div class="l">Pending</div><div class="v" style="font-size:22px;color:var(--warn)">41</div></div>
+              <div class="kpi"><div class="l">Exceptions</div><div class="v" style="font-size:22px;color:var(--danger)">7</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Integration Health</h3>
+            <div class="health-list">
+              <div class="health-item"><span>GCC API (Gulf Custody)</span><span class="pill ok">Healthy</span></div>
+              <div class="health-item"><span>PostgreSQL Database</span><span class="pill ok">Healthy</span></div>
+              <div class="health-item"><span>Payment Gateway</span><span class="pill ok">Healthy</span></div>
+              <div class="health-item"><span>SMS / Email</span><span class="pill warn">Degraded</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px;padding:0;overflow:hidden;">
+          <div style="padding:14px 16px;font-weight:700;color:var(--navy);">Exceptions</div>
+          <table>
+            <thead><tr><th style="padding-left:16px">Reference</th><th>Type</th><th>Channel Amt</th><th>GCC Amt</th><th>Variance</th><th>Status</th><th></th></tr></thead>
+            <tbody id="excBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <section class="page" id="page-notifications">
+        <div class="page-h">
+          <div><h1>Notifications</h1><p>Templates aligned to BRD matrix (SMS / Email / Push).</p></div>
+          <button class="btn btn-gold" onclick="toast('Template editor (demo)')">Edit template</button>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th style="padding-left:16px">Event</th><th>SMS</th><th>Email</th><th>In-app / Push</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="padding-left:16px">OTP</td><td>✓</td><td>—</td><td>—</td><td><a class="link" href="#" onclick="toast('Edit OTP template');return false;">Edit</a></td></tr>
+              <tr><td style="padding-left:16px">Account opening received</td><td>✓</td><td>—</td><td>—</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
+              <tr><td style="padding-left:16px">Account approved</td><td>✓</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
+              <tr><td style="padding-left:16px">Subscribe / Redeem / SIP</td><td>✓</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
+              <tr><td style="padding-left:16px">Factsheet uploaded</td><td>—</td><td>—</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
+              <tr><td style="padding-left:16px">NAV / fund update</td><td>—</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- INTEGRATION -->
+      <section class="page" id="page-integration">
+        <div class="page-h">
+          <div><h1>Integration Health</h1><p>GCC API, database, payments, messaging.</p></div>
+          <button class="btn btn-navy" onclick="toast('Health check run (demo)')">Run health check</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Overall</div><div class="v" style="font-size:22px;color:var(--ok)">Healthy</div></div>
+          <div class="kpi"><div class="l">Uptime</div><div class="v" style="font-size:22px">99.98%</div></div>
+          <div class="kpi"><div class="l">Pending queue</div><div class="v" style="font-size:22px">23</div></div>
+          <div class="kpi"><div class="l">Failures (24h)</div><div class="v" style="font-size:22px;color:var(--danger)">12</div></div>
+        </div>
+        <div class="card">
+          <div class="health-list">
+            <div class="health-item"><span>GCC — Client On Boarding</span><span class="pill ok">OK</span></div>
+            <div class="health-item"><span>GCC — Unit Subs / Redem</span><span class="pill ok">OK</span></div>
+            <div class="health-item"><span>GCC — NAV</span><span class="pill ok">OK</span></div>
+            <div class="health-item"><span>GCC — Unit Holder Statement</span><span class="pill ok">OK</span></div>
+            <div class="health-item"><span>GCC — Sub/Red Enquiry</span><span class="pill ok">OK</span></div>
+            <div class="health-item"><span>SMS / Email gateway</span><span class="pill warn">Degraded</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIT -->
+      <section class="page" id="page-audit">
+        <div class="page-h"><div><h1>Audit Logs</h1><p>Immutable admin and system actions.</p></div></div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th style="padding-left:16px">Time</th><th>User</th><th>Action</th><th>Entity</th><th>Source</th></tr></thead>
+            <tbody id="auditBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="page" id="page-settings">
+        <div class="page-h"><div><h1>Settings &amp; reference data</h1><p>Channel config and GCC Excel reference lists.</p></div></div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table>
+            <thead><tr><th style="padding-left:16px">Master list</th><th>Source</th><th>Admin action</th></tr></thead>
+            <tbody>
+              <tr><td style="padding-left:16px">Currencies / ISO codes</td><td>GCC Excel — ISO Codes</td><td><a class="link" href="#" onclick="toast('ISO list (demo)');return false;">View</a></td></tr>
+              <tr><td style="padding-left:16px">Stock exchanges</td><td>GCC Excel — ISO Codes</td><td>View</td></tr>
+              <tr><td style="padding-left:16px">Title / Gender / Residence / Customer type</td><td>Client On Boarding sheet</td><td>Maintain mapping</td></tr>
+              <tr><td style="padding-left:16px">Cut-off times</td><td>Channel config</td><td><a class="link" href="#" onclick="go('funds');return false;">Edit in Funds</a></td></tr>
+              <tr><td style="padding-left:16px">Notification templates</td><td>BRD matrix</td><td><a class="link" href="#" onclick="go('notifications');return false;">Open</a></td></tr>
+              <tr><td style="padding-left:16px">Staff users &amp; roles</td><td>Admin</td><td>Manage (demo)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note-box">
+          Demo only — no live GCC calls. Theme inspired by usoman.com and the United Securities Fund Management admin mockups.
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <span>© 2026 United Securities LLC · Admin Portal Demo</span>
+      <b>Gulf Custody is the golden source</b>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const investors = [
+  { id:'INV-1001', name:'Ahmed Al-Saidi', mobile:'+968 9123 4567', ref:'USO-2026-00482', kyc:'Verified', account:'Active', value:'10,441 OMR', sync:'29 Jul 14:02', email:'ahmed@email.com', bank:'**** 4510', fund:'United GCC Fund', holdings:[{f:'United GCC Fund',v:'6,200 OMR'},{f:'United US Markets Fund',v:'4,241 OMR'}] },
+  { id:'INV-1002', name:'Sara Al-Balushi', mobile:'+968 9900 1122', ref:'USO-2026-00491', kyc:'Pending at Gulf Custody', account:'In review', value:'0.000 OMR', sync:'29 Jul 13:40', email:'sara@email.com', bank:'**** 2201', fund:'—', holdings:[] },
+  { id:'INV-1003', name:'Omar Al-Hinai', mobile:'+968 9555 7788', ref:'USO-2026-00310', kyc:'Verified', account:'Active', value:'3,850 OMR', sync:'29 Jul 12:15', email:'omar@email.com', bank:'**** 8890', fund:'United US Markets Fund', holdings:[{f:'United US Markets Fund',v:'3,850 OMR'}] },
+  { id:'INV-1004', name:'Fatima Al-Lawati', mobile:'+968 9333 4411', ref:'USO-2026-00288', kyc:'Action Required', account:'Restricted', value:'1,200 OMR', sync:'28 Jul 18:01', email:'fatima@email.com', bank:'**** 1102', fund:'United GCC Fund', holdings:[{f:'United GCC Fund',v:'1,200 OMR'}] },
+  { id:'INV-1005', name:'Yousuf Al-Riyami', mobile:'+968 9777 6655', ref:'USO-2026-00155', kyc:'Verified', account:'Active', value:'22,410 OMR', sync:'29 Jul 14:02', email:'yousuf@email.com', bank:'**** 6655', fund:'United GCC Fund', holdings:[{f:'United GCC Fund',v:'15,000 OMR'},{f:'United US Markets Fund',v:'7,410 OMR'}] },
+];
+
+const transactions = [
+  { ref:'TXN1012', inv:'Ahmed Al-Saidi', fund:'United GCC Fund', type:'Subscription', amt:'1,000', cutoff:'Before', status:'Pending at Gulf Custody', date:'29 Jul 13:55' },
+  { ref:'TXN1011', inv:'Sara Al-Balushi', fund:'United US Markets Fund', type:'Redemption', amt:'500', cutoff:'Before', status:'Processed', date:'29 Jul 11:20' },
+  { ref:'SIP-88', inv:'Omar Al-Hinai', fund:'United GCC Fund', type:'SIP', amt:'200', cutoff:'—', status:'In Progress', date:'29 Jul 09:00' },
+  { ref:'TXN1009', inv:'Yousuf Al-Riyami', fund:'United US Markets Fund', type:'Subscription', amt:'2,500', cutoff:'After', status:'Pending at Gulf Custody', date:'28 Jul 16:40' },
+  { ref:'TXN1008', inv:'Fatima Al-Lawati', fund:'United GCC Fund', type:'Redemption', amt:'300', cutoff:'Before', status:'Failed', date:'28 Jul 15:10' },
+  { ref:'TXN1007', inv:'Ahmed Al-Saidi', fund:'United US Markets Fund', type:'Subscription', amt:'750', cutoff:'Before', status:'Processed', date:'28 Jul 10:05' },
+];
+
+let funds = [
+  { code:'E71', name:'United GCC Fund', nameAr:'صندوق United GCC', ccy:'USD', risk:'Medium', min:'1,000', cutoff:'12:00 PM Muscat', nav:'1.465', status:'Active' },
+  { code:'E59', name:'United US Markets Fund', nameAr:'صندوق United US Markets', ccy:'USD', risk:'High', min:'1,000', cutoff:'12:00 PM Muscat', nav:'2.118', status:'Active' },
+];
+let selectedFund = 0;
+let selectedInv = 0;
+
+const docs = [
+  { fund:'E71 GCC', type:'Factsheet', ver:'Jul 2026', status:'Live' },
+  { fund:'E71 GCC', type:'Prospectus', ver:'2025', status:'Live' },
+  { fund:'E59 US Markets', type:'Factsheet', ver:'Jun 2026', status:'Update due' },
+  { fund:'E59 US Markets', type:'Prospectus', ver:'2025', status:'Live' },
+];
+
+const exceptions = [
+  { ref:'TXN1008', type:'Redemption', ch:'300.000', gcc:'0.000', var:'300.000', status:'Exception' },
+  { ref:'TXN1009', type:'Subscription', ch:'2,500.000', gcc:'2,500.000', var:'0.000', status:'Pending' },
+  { ref:'SIP-87', type:'SIP Collection', ch:'200.000', gcc:'195.000', var:'5.000', status:'Exception' },
+];
+
+const audits = [
+  { t:'29 Jul 15:02', u:'fatima@usoman.com', a:'Published document', e:'E71 Factsheet', s:'Admin' },
+  { t:'29 Jul 14:40', u:'fatima@usoman.com', a:'Updated cut-off', e:'E59 → 12:00', s:'Admin' },
+  { t:'29 Jul 14:02', u:'system', a:'NAV sync', e:'E71, E59', s:'GCC' },
+  { t:'29 Jul 13:55', u:'system', a:'Order submitted', e:'TXN1012', s:'Mobile BFF' },
+  { t:'29 Jul 11:10', u:'ops@usoman.com', a:'Exported report', e:'Subscriptions MTD', s:'Admin' },
+];
+
+function pill(status) {
+  let cls = 'muted';
+  if (/Processed|Verified|Active|Live|Healthy|OK|Matched/i.test(status)) cls = 'ok';
+  else if (/Pending|In Progress|In review|Update|Degraded/i.test(status)) cls = 'warn';
+  else if (/Failed|Exception|Action|Restricted/i.test(status)) cls = 'danger';
+  else if (/Subscription/i.test(status)) cls = 'navy';
+  return `<span class="pill ${cls}">${status}</span>`;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('#nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  if (page === 'dashboard') setTimeout(renderCharts, 50);
+}
+
+document.getElementById('nav').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-page]');
+  if (btn) go(btn.dataset.page);
+});
+
+function renderDashTx() {
+  document.getElementById('dashTxBody').innerHTML = transactions.slice(0,4).map(t => `
+    <tr>
+      <td>${t.ref}</td><td>${t.inv}</td><td>${t.fund}</td>
+      <td>${t.type}</td><td>${t.amt}</td><td>${pill(t.status)}</td>
+    </tr>`).join('');
+}
+
+function renderInvestors() {
+  const q = (document.getElementById('invSearch').value || '').toLowerCase();
+  const kyc = document.getElementById('invKyc').value;
+  const fund = document.getElementById('invFund').value;
+  const rows = investors.filter(i =>
+    (!q || i.name.toLowerCase().includes(q) || i.mobile.includes(q) || i.ref.toLowerCase().includes(q)) &&
+    (!kyc || i.kyc === kyc) &&
+    (!fund || i.fund === fund || (fund && i.holdings.some(h => h.f === fund)))
+  );
+  document.getElementById('invBody').innerHTML = rows.map((i, idx) => {
+    const realIdx = investors.indexOf(i);
+    return `<tr class="clickable ${realIdx===selectedInv?'selected':''}" onclick="selectInv(${realIdx})">
+      <td style="padding-left:16px"><b>${i.name}</b><div style="color:var(--muted);font-size:11px">${i.id}</div></td>
+      <td>${i.mobile}</td><td>${i.ref}</td>
+      <td>${pill(i.kyc)}</td><td>${pill(i.account)}</td>
+      <td><b>${i.value}</b></td><td>${i.sync}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('invCount').textContent = `Showing ${rows.length} of ${investors.length}`;
+  renderInvDetail();
+}
+
+function selectInv(i) { selectedInv = i; renderInvestors(); }
+
+function renderInvDetail() {
+  const i = investors[selectedInv];
+  if (!i) return;
+  document.getElementById('invDetail').innerHTML = `
+    <h3>${i.name}</h3>
+    <div class="sub">${i.id} · ${i.ref}</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">${pill(i.account)} ${pill(i.kyc)}</div>
+    <div class="section-label">Investor information</div>
+    <div class="kv"><span>Mobile</span><b>${i.mobile}</b></div>
+    <div class="kv"><span>Email</span><b>${i.email}</b></div>
+    <div class="kv"><span>Bank</span><b>${i.bank}</b></div>
+    <div class="kv"><span>Primary fund</span><b>${i.fund}</b></div>
+    <div class="section-label">KYC (read-only)</div>
+    <div class="kv"><span>Status</span><b>${i.kyc}</b></div>
+    <div class="kv"><span>Last GCC sync</span><b>${i.sync}</b></div>
+    <div class="note-box">Approve / reject is performed in Gulf Custody — not in this portal.</div>
+    <div class="section-label">Holdings summary</div>
+    ${i.holdings.length ? i.holdings.map(h => `<div class="kv"><span>${h.f}</span><b>${h.v}</b></div>`).join('') : '<div class="kv"><span>No holdings yet</span><b>0.000 OMR</b></div>'}
+    <div class="kv"><span>Total</span><b>${i.value}</b></div>
+    <div class="section-label">KYC documents</div>
+    <div class="kv"><span>Civil ID</span><b>View</b></div>
+    <div class="kv"><span>Proof of address</span><b>View</b></div>
+    <div class="kv"><span>Bank letter</span><b>View</b></div>
+  `;
+}
+
+function renderTx() {
+  const type = document.getElementById('txType').value;
+  const status = document.getElementById('txStatus').value;
+  const rows = transactions.filter(t => (!type || t.type === type) && (!status || t.status === status));
+  document.getElementById('txBody').innerHTML = rows.map(t => `
+    <tr>
+      <td style="padding-left:16px">${t.ref}</td><td>${t.inv}</td><td>${t.fund}</td>
+      <td>${t.type}</td><td><b>${t.amt}</b></td><td>${t.cutoff}</td>
+      <td>${pill(t.status)}</td><td>${t.date}</td>
+    </tr>`).join('');
+}
+
+function renderFunds() {
+  document.getElementById('fundBody').innerHTML = funds.map((f, idx) => `
+    <tr class="clickable ${idx===selectedFund?'selected':''}" onclick="editFund(${idx})">
+      <td style="padding-left:16px"><b>${f.code}</b></td>
+      <td>${f.name}</td><td>${f.ccy}</td><td>${f.risk}</td>
+      <td>${f.min}</td><td>${f.cutoff}</td><td>${f.nav}</td>
+      <td>${pill(f.status)}</td>
+      <td><a class="link" href="#" onclick="editFund(${idx});return false;">Edit</a></td>
+    </tr>`).join('');
+  const f = funds[selectedFund];
+  document.getElementById('fName').value = f.name;
+  document.getElementById('fNameAr').value = f.nameAr;
+  document.getElementById('fCutoff').value = f.cutoff;
+  document.getElementById('fMin').value = f.min;
+}
+
+function editFund(i) { selectedFund = i; renderFunds(); }
+function saveFund() {
+  const f = funds[selectedFund];
+  f.name = document.getElementById('fName').value;
+  f.nameAr = document.getElementById('fNameAr').value;
+  f.cutoff = document.getElementById('fCutoff').value;
+  f.min = document.getElementById('fMin').value;
+  renderFunds();
+  toast('Fund master saved (demo): ' + f.code);
+}
+
+function renderDocs() {
+  document.getElementById('docBody').innerHTML = docs.map(d => `
+    <tr>
+      <td>${d.fund}</td><td>${d.type}</td><td>${d.ver}</td>
+      <td>${pill(d.status)}</td>
+      <td><a class="link" href="#" onclick="toast('Replace ${d.type} (demo)');return false;">Replace</a></td>
+    </tr>`).join('');
+}
+
+function publishDoc() {
+  const fund = document.getElementById('docFund').value;
+  const type = document.getElementById('docType').value;
+  const file = document.getElementById('docFile').files[0];
+  docs.unshift({ fund: fund.includes('E71') ? 'E71 GCC' : 'E59 US Markets', type, ver: 'Jul 2026', status: 'Live' });
+  renderDocs();
+  toast(`Published ${type} for ${fund}${file ? ' · ' + file.name : ''} (demo). Push notification can be sent to investors.`);
+}
+
+function renderReports() {
+  const items = [
+    ['Subscriptions & Redemptions', 'Order volume and status for the period'],
+    ['Investor Holdings', 'Units and values from Unit Holder Statement'],
+    ['SIP Collections', 'Recurring debit runs and outcomes'],
+    ['Payment Reconciliation', 'Channel payments vs settlement'],
+    ['Gulf Custody Reconciliation', 'App orders vs GCC confirmations'],
+    ['Notification Delivery', 'SMS / Email / Push success rates'],
+  ];
+  document.getElementById('reportGrid').innerHTML = items.map(([t,d]) => `
+    <div class="report-card">
+      <div class="icon">▥</div>
+      <h4>${t}</h4>
+      <p>${d}</p>
+      <div class="report-actions">
+        <button class="btn btn-navy" onclick="toast('PDF generated (demo): ${t}')">PDF</button>
+        <button class="btn btn-ghost" onclick="toast('CSV generated (demo): ${t}')">CSV</button>
+        <button class="btn btn-ghost" onclick="toast('Schedule saved (demo)')">Schedule</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('excBody').innerHTML = exceptions.map(e => `
+    <tr>
+      <td style="padding-left:16px">${e.ref}</td><td>${e.type}</td>
+      <td>${e.ch}</td><td>${e.gcc}</td><td>${e.var}</td>
+      <td>${pill(e.status)}</td>
+      <td><a class="link" href="#" onclick="toast('Exception detail ${e.ref}');return false;">View</a></td>
+    </tr>`).join('');
+}
+
+function renderAudit() {
+  document.getElementById('auditBody').innerHTML = audits.map(a => `
+    <tr>
+      <td style="padding-left:16px">${a.t}</td><td>${a.u}</td><td>${a.a}</td><td>${a.e}</td><td>${a.s}</td>
+    </tr>`).join('');
+}
+
+let chartsReady = false;
+function renderCharts() {
+  const trend = document.getElementById('trendChart');
+  const status = document.getElementById('statusChart');
+  if (!trend || !window.Chart) return;
+  if (chartsReady) return;
+  chartsReady = true;
+  new Chart(trend, {
+    type: 'line',
+    data: {
+      labels: ['Jul 23','Jul 24','Jul 25','Jul 26','Jul 27','Jul 28','Jul 29'],
+      datasets: [
+        { label: 'Subscriptions', data: [120,150,140,180,210,190,248], borderColor: '#00325d', backgroundColor: 'rgba(0,50,93,0.08)', tension: 0.35, fill: true },
+        { label: 'Redemptions', data: [80,70,95,60,110,100,91], borderColor: '#fab802', backgroundColor: 'rgba(250,184,2,0.08)', tension: 0.35, fill: true },
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+  });
+  new Chart(status, {
+    type: 'doughnut',
+    data: {
+      labels: ['Processed','Pending at GCC','In Progress','Failed','Cancelled'],
+      datasets: [{ data: [1044,312,201,112,83], backgroundColor: ['#00325d','#fab802','#159947','#dc2626','#94a3b8'] }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        title: { display: true, text: '1,752 Total', position: 'bottom' }
+      }
+    }
+  });
+}
+
+document.getElementById('invSearch').addEventListener('input', renderInvestors);
+document.getElementById('invKyc').addEventListener('change', renderInvestors);
+document.getElementById('invFund').addEventListener('change', renderInvestors);
+document.getElementById('txType').addEventListener('change', renderTx);
+document.getElementById('txStatus').addEventListener('change', renderTx);
+document.getElementById('globalSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { go('investors'); document.getElementById('invSearch').value = e.target.value; renderInvestors(); }
+});
+document.getElementById('langEn').onclick = () => { document.getElementById('langEn').classList.add('on'); document.getElementById('langAr').classList.remove('on'); toast('Language: English'); };
+document.getElementById('langAr').onclick = () => { document.getElementById('langAr').classList.add('on'); document.getElementById('langEn').classList.remove('on'); toast('Language: العربية (demo)'); };
+
+const dz = document.getElementById('dropzone');
+const fileInput = document.getElementById('docFile');
+dz.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) toast('Selected: ' + fileInput.files[0].name);
+});
+dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.style.background = '#fff3c4'; });
+dz.addEventListener('dragleave', () => { dz.style.background = '#fffdf5'; });
+dz.addEventListener('drop', (e) => {
+  e.preventDefault(); dz.style.background = '#fffdf5';
+  if (e.dataTransfer.files[0]) { fileInput.files = e.dataTransfer.files; toast('Selected: ' + e.dataTransfer.files[0].name); }
+});
+
+renderDashTx();
+renderInvestors();
+renderTx();
+renderFunds();
+renderDocs();
+renderReports();
+renderAudit();
+renderCharts();
+</script>
+</body>
+</html>
