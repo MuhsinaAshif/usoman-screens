@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>United Securities — Mobile App Screen Review</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; background: #e8eaed; color: #1a1a1a; padding: 24px 16px 48px; }
+    .wrap { max-width: 1180px; margin: 0 auto; }
+    .hero {
+      background: #0a1628; color: #fff; border-radius: 16px; padding: 28px 28px 24px;
+      margin-bottom: 24px;
+    }
+    .hero h1 { font-size: 1.55rem; margin-bottom: 8px; }
+    .hero p { font-size: 0.92rem; line-height: 1.55; color: rgba(255,255,255,0.82); max-width: 820px; }
+    .hero .meta { margin-top: 14px; font-size: 0.8rem; color: #d4af6a; }
+    .intro {
+      background: #fff; border-radius: 12px; padding: 18px 22px; margin-bottom: 28px;
+      border: 1px solid #d5d9de; font-size: 0.9rem; line-height: 1.6;
+    }
+    .intro strong { color: #0a1628; }
+    .section {
+      background: #fff; border-radius: 14px; border: 1px solid #d0d5da;
+      overflow: hidden; margin-bottom: 28px;
+    }
+    .section-h { background: #0a1628; color: #fff; padding: 16px 20px; }
+    .section-h h2 { font-size: 1.1rem; margin-bottom: 4px; }
+    .section-h p { font-size: 0.82rem; opacity: 0.88; line-height: 1.45; }
+    .path {
+      display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 18px;
+      background: #f3f5f7; border-bottom: 1px solid #e2e6ea; font-size: 0.72rem;
+    }
+    .path span {
+      background: #fff; border: 1px solid #c5cdd4; padding: 4px 10px;
+      border-radius: 14px; color: #0a1628;
+    }
+    .screen {
+      display: grid; grid-template-columns: 300px 1fr; gap: 24px;
+      padding: 22px 20px; border-bottom: 1px solid #eef1f4;
+      align-items: start;
+    }
+    .screen:last-child { border-bottom: none; }
+    @media (max-width: 800px) {
+      .screen { grid-template-columns: 1fr; justify-items: center; }
+      .desc { text-align: left; width: 100%; }
+    }
+    .phone-img {
+      width: 280px; border-radius: 24px; border: 2px solid #b8c0c8;
+      box-shadow: 0 8px 22px rgba(10,22,40,0.12); display: block;
+    }
+    .phone-ui {
+      width: 280px; border-radius: 24px; border: 2px solid #b8c0c8;
+      overflow: hidden; box-shadow: 0 8px 22px rgba(10,22,40,0.12); background: #fff;
+    }
+    .desc h3 { font-size: 1.05rem; color: #0a1628; margin-bottom: 6px; }
+.desc p { font-size: 0.9rem; line-height: 1.55; color: #334155; margin-bottom: 10px; }
+    .desc ul { margin: 0 0 0 18px; font-size: 0.86rem; line-height: 1.55; color: #475569; }
+    .desc li { margin-bottom: 4px; }
+    .feel {
+      margin-top: 12px; padding: 10px 12px; background: #f8fafc;
+      border-radius: 8px; border-left: 3px solid #14b8a6;
+      font-size: 0.82rem; color: #0f766e; line-height: 1.45;
+    }
+
+    /* Mock UI styles */
+    .land { background: radial-gradient(ellipse at 50% 0%, #1a3a5c 0%, #0a1628 55%, #060d18 100%); min-height: 500px; padding: 16px; color: #fff; text-align: center; }
+    .land-top { display: flex; justify-content: space-between; align-items: center; }
+    .land-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 10px; font-size: 9px; }
+    .land-badge i { width: 6px; height: 6px; background: #f59e0b; border-radius: 50%; display: inline-block; }
+    .land-lang { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 4px 8px; font-size: 10px; }
+    .land-lang b { background: #fff; color: #0a1628; padding: 2px 6px; border-radius: 10px; }
+    .land-logo { width: 56px; height: 56px; margin: 36px auto 8px; background: linear-gradient(135deg, #2a4a6e, #1a3050); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #d4af6a; border: 1px solid rgba(212,175,106,0.4); }
+    .land-est { font-size: 9px; color: #d4af6a; letter-spacing: 0.12em; margin: 8px 0; }
+    .land-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .land-desc { font-size: 10px; color: rgba(255,255,255,0.65); line-height: 1.5; padding: 0 12px; margin-bottom: 16px; }
+    .land-feats { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; }
+    .land-feat { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 8px 6px; font-size: 8px; width: 78px; }
+    .btn-doc { flex: 1; padding: 11px 4px; border-radius: 10px; font-size: 10px; font-weight: 600; border: 1px solid rgba(212,175,106,0.5); background: rgba(212,175,106,0.15); color: #f5e6c8; }
+    .btn-doc.alt { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #fff; }
+    .btn-enter { width: 100%; padding: 13px; border-radius: 12px; background: #fff; color: #0a1628; font-weight: 700; font-size: 12px; margin-top: 10px; border: none; }
+    .land-foot { font-size: 8px; color: rgba(255,255,255,0.45); margin-top: 14px; }
+
+    .ui { background: #f4f6f8; min-height: 500px; }
+    .bar { background: #0a1628; color: #fff; padding: 12px; font-size: 13px; font-weight: 600; text-align: center; }
+    .body { padding: 14px; text-align: left; }
+    .prog { display: flex; gap: 5px; margin-bottom: 12px; }
+    .prog i { flex: 1; height: 4px; border-radius: 2px; background: #e2e6ea; }
+    .prog i.on { background: #14b8a6; }
+    .h { font-size: 15px; font-weight: 700; color: #0a1628; margin-bottom: 4px; }
+    .muted { font-size: 10px; color: #5c6670; margin-bottom: 10px; line-height: 1.4; }
+    .fld { background: #fff; border: 1px solid #e2e6ea; border-radius: 10px; padding: 10px; margin-bottom: 8px; font-size: 11px; }
+    .fld label { display: block; font-size: 9px; color: #5c6670; text-transform: uppercase; margin-bottom: 3px; }
+    .btn-p { background: #0a1628; color: #fff; text-align: center; padding: 12px; border-radius: 10px; font-weight: 600; margin-top: 10px; font-size: 12px; }
+    .btn-s { background: #14b8a6; color: #fff; text-align: center; padding: 12px; border-radius: 10px; font-weight: 600; margin-top: 10px; font-size: 12px; }
+    .ok { width: 52px; height: 52px; background: #1b7f4e; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 28px auto 12px; }
+    .badge-warn { display: inline-block; background: #FEF3C7; color: #92400E; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+    .info-green { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 10px; padding: 10px; font-size: 10px; margin-bottom: 8px; line-height: 1.4; }
+    .row2 { display: flex; gap: 8px; margin-top: 8px; }
+    .tile { flex: 1; background: #fff; border: 1px solid #e2e6ea; border-radius: 10px; padding: 12px 6px; text-align: center; font-size: 11px; font-weight: 600; }
+    .tile.off { opacity: 0.4; }
+    .tile small { display: block; font-size: 9px; font-weight: 400; color: #5c6670; margin-top: 3px; }
+    .kv { display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px; }
+    .footer-note {
+      text-align: center; font-size: 0.82rem; color: #64748b; margin-top: 8px; line-height: 1.5;
+    }
+
+    /* Home dashboard mock (approved / zero balance) */
+    .home-ui { background: #f7f8fa; min-height: 520px; padding: 12px 12px 8px; text-align: left; }
+    .home-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .home-user { display: flex; align-items: center; gap: 8px; }
+    .home-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#1a3050,#0a1628); color: #d4af6a; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+    .home-hi { font-size: 10px; color: #64748b; }
+    .home-name { font-size: 12px; font-weight: 700; color: #0a1628; }
+    .home-tools { display: flex; gap: 6px; align-items: center; font-size: 10px; color: #475569; }
+    .home-pill { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 3px 7px; }
+    .home-pill b { background: #0f766e; color: #fff; padding: 1px 5px; border-radius: 8px; margin-right: 2px; }
+    .port { background: linear-gradient(135deg, #0a1628 0%, #0f4c5c 55%, #0d9488 100%); border-radius: 16px; padding: 14px; color: #fff; margin-bottom: 12px; position: relative; overflow: hidden; }
+    .port .lbl { font-size: 9px; letter-spacing: 0.08em; opacity: 0.85; margin-bottom: 6px; }
+    .port .val { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+    .port .chg { display: inline-block; margin-top: 8px; background: rgba(16,185,129,0.25); color: #bbf7d0; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+    .port .chg.flat { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); }
+    .port .hint { margin-top: 10px; font-size: 10px; line-height: 1.4; color: rgba(255,255,255,0.78); }
+    .port svg { position: absolute; right: 8px; bottom: 8px; opacity: 0.35; }
+    .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .act { border-radius: 12px; padding: 12px 8px; text-align: center; font-size: 12px; font-weight: 700; }
+    .act.sub { background: #0f766e; color: #fff; }
+    .act.red { background: #fff; border: 1px solid #d1d5db; color: #0a1628; }
+    .act.red.off { opacity: 0.45; background: #f1f5f9; color: #94a3b8; }
+    .act.sm { background: #fff; border: 1px solid #e2e8f0; color: #0f766e; font-size: 11px; }
+    .feat-h { display: flex; justify-content: space-between; align-items: center; margin: 12px 2px 8px; }
+    .feat-h strong { font-size: 13px; color: #0a1628; }
+    .feat-h a { font-size: 11px; color: #0f766e; font-weight: 600; text-decoration: none; }
+    .fund-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px; margin-bottom: 8px; }
+    .fund-card .fn { font-size: 12px; font-weight: 700; color: #0a1628; }
+    .fund-card .fc { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .fund-card .yp { display: inline-block; margin-top: 6px; font-size: 9px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 2px 6px; border-radius: 8px; }
+    .bnav { display: flex; justify-content: space-around; border-top: 1px solid #e2e8f0; background: #fff; padding: 8px 4px 10px; margin: 10px -12px -8px; font-size: 8px; color: #94a3b8; text-align: center; }
+    .bnav .on { color: #0f766e; font-weight: 700; }
+    .bnav span { display: block; font-size: 14px; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>United Securities — Mobile App Screen Review</h1>
+    <p>
+      Please review the screens below and confirm the look, feel, and user journey.
+      This document shows how the investor app will appear for <strong style="color:#fff;">new investors</strong>
+      and <strong style="color:#fff;">already registered investors</strong>.
+    </p>
+    <div class="meta">Prepared for client confirmation · United Securities investor mobile app</div>
+  </div>
+
+  <div class="intro">
+    <strong>How to review:</strong>
+    For each screen, please check the layout, colours, wording, and whether the journey feels clear for your investors.
+    Kindly confirm if any screen should be changed before we proceed with full development.
+  </div>
+
+  <!-- ===================== FLOW A ===================== -->
+  <div class="section">
+    <div class="section-h">
+      <h2>Journey A — New investor (first-time user)</h2>
+      <p>From welcome screen to account opening, waiting for approval, then full access after approval.</p>
+    </div>
+    <div class="path">
+      <span>Landing</span><span>Login</span><span>OTP</span><span>KYC steps</span>
+      <span>Submitted</span><span>Pending home</span><span>Home (0 OMR)</span><span>Home (with balance)</span>
+    </div>
+
+    <!-- 01 Landing -->
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="land">
+          <div class="land-top">
+            <div class="land-badge"><i></i> PRIVATE ACCESS</div>
+            <div class="land-lang"><b>EN</b> ع</div>
+          </div>
+          <div class="land-logo">U</div>
+          <div class="land-est">— EST. UNITED SECURITIES —</div>
+          <div class="land-title">United Fund</div>
+          <div class="land-desc">A private investment platform for authorised investors. Curated funds and transparent performance.</div>
+          <div class="land-feats">
+            <div class="land-feat">FSA Regulated</div>
+            <div class="land-feat">Bank-grade Security</div>
+            <div class="land-feat">Curated Funds</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <div class="btn-doc">Factsheet</div>
+            <div class="btn-doc alt">Prospectus</div>
+          </div>
+          <button class="btn-enter">Enter Investor App →</button>
+          <div class="land-foot">FSA REGULATED · OMAN</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>1. Welcome / Landing screen</h3>
+        <p>
+          Dark premium welcome screen with United Securities branding, English / Arabic language toggle,
+          and a short introduction to the investor app.
+        </p>
+        <ul>
+          <li><strong>Factsheet</strong> and <strong>Prospectus</strong> buttons — investors can read fund documents before signing in</li>
+          <li>Main action: <strong>Enter Investor App</strong></li>
+          <li>Trust signals: FSA regulated, security, curated funds</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Dark navy + gold accents, private-banking style, calm and premium.</div>
+      </div>
+    </div>
+
+    <!-- 02 Login (Factsheet / Prospectus removed) -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Investor Login</div>
+        <div class="body" style="background:#f4f6f8;min-height:460px;">
+          <div class="h" style="font-size:18px;margin-top:8px;">Secure access to your fund portfolio</div>
+          <div class="muted" style="margin-bottom:18px;">Authorised United Securities investors only</div>
+          <div class="fld">
+            <label>Mobile number</label>
+            +968 9123 4567
+          </div>
+          <div class="btn-p">Access Investor App</div>
+          <div style="margin-top:10px;background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:12px;text-align:center;font-size:12px;font-weight:600;color:#0a1628;">
+            Use biometric login
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>2. Investor login</h3>
+        <p>
+          Clean login with mobile number entry (Oman +968).
+          <strong>Factsheet and Prospectus removed from this screen</strong> —
+          they appear only on the welcome / landing screen.
+        </p>
+        <ul>
+          <li>Primary button: Access Investor App (sends OTP)</li>
+          <li>Optional biometric login for returning users</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Simple, trustworthy login — documents stay on the first page.</div>
+      </div>
+    </div>
+
+    <!-- 03 OTP -->
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image3.png" alt="OTP verification" />
+      <div class="desc">
+        <h3>3. OTP verification</h3>
+        <p>
+          Investor enters the 6-digit code sent to their mobile.
+          Timer and Resend options are shown. No “open an account” link on this screen —
+          new vs existing user is handled automatically after verification.
+        </p>
+        <ul>
+          <li>Masked mobile number for privacy</li>
+          <li>Confirm button to continue</li>
+          <li>Help text for SMS / email delivery</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Modern verification screen with financial header image and clear OTP boxes.</div>
+      </div>
+    </div>
+
+    <!-- KYC 1 -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Open account</div>
+        <div class="body">
+          <div class="prog"><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="h">Personal details</div>
+          <div class="muted">Step 1 of 4 · Tell us about yourself</div>
+          <div class="fld"><label>First name</label>Ahmed</div>
+          <div class="fld"><label>Last name</label>Al Balushi</div>
+          <div class="fld"><label>Email</label>ahmed@email.com</div>
+          <div class="fld"><label>Mobile</label>+968 9123 4567</div>
+          <div class="fld"><label>City</label>Muscat</div>
+          <div class="btn-p">Continue</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>4. KYC — Personal details</h3>
+        <p>First step of account opening for new investors. Progress bar shows 4 steps.</p>
+        <ul>
+          <li>Name, email, mobile, city</li>
+          <li>Simple form with Continue button</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Light form screen, teal progress, easy step-by-step onboarding.</div>
+      </div>
+    </div>
+
+    <!-- KYC 2 -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Open account</div>
+        <div class="body">
+          <div class="prog"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <div class="h">Identity</div>
+          <div class="muted">Step 2 of 4 · Civil ID / passport</div>
+          <div class="fld"><label>Legal ID</label>12345678</div>
+          <div class="fld"><label>Document type</label>Civil ID</div>
+          <div class="fld"><label>Date of birth</label>15 Jan 1990</div>
+          <div class="fld"><label>Nationality</label>Oman</div>
+          <div class="fld"><label>Residence status</label>Resident</div>
+          <div class="btn-p">Continue</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>5. KYC — Identity</h3>
+        <p>Collects legal identity details required to open an investment account.</p>
+        <ul>
+          <li>Civil ID or passport</li>
+          <li>Date of birth, nationality, residence status</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same onboarding style — clear fields, professional and compliant.</div>
+      </div>
+    </div>
+
+    <!-- KYC 3 -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Open account</div>
+        <div class="body">
+          <div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+          <div class="h">Bank details</div>
+          <div class="muted">Step 3 of 4 · For subscribe &amp; redeem payments</div>
+          <div class="fld"><label>Bank name</label>Bank Muscat</div>
+          <div class="fld"><label>Account number</label>OM81 •••• •••• 0001</div>
+          <div class="fld"><label>Account type</label>Current · USD</div>
+          <div class="fld"><label>SWIFT</label>BMUSOMRXXXX</div>
+          <div class="btn-p">Continue</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>6. KYC — Bank account</h3>
+        <p>Investor bank details for subscription payments and redemption payouts.</p>
+        <ul>
+          <li>Bank name, account number, SWIFT</li>
+          <li>Masked account number for privacy where shown later</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Secure banking form, same visual language as previous KYC steps.</div>
+      </div>
+    </div>
+
+    <!-- KYC 4 -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Open account</div>
+        <div class="body">
+          <div class="prog"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <div class="h">Review</div>
+          <div class="muted">Step 4 of 4 · Confirm your application</div>
+          <div class="fld">Ahmed Al Balushi · ID 12345678</div>
+          <div class="fld">Bank Muscat · •••• 0001</div>
+          <div class="fld" style="font-size:10px;">☑ I accept the prospectus and risk disclosures<br/>☑ I agree to open an investor account</div>
+          <div class="btn-s">Submit application</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>7. KYC — Review &amp; submit</h3>
+        <p>Summary of entered details with consent checkboxes before final submission.</p>
+        <ul>
+          <li>Prospectus / risk acceptance</li>
+          <li>Account opening consent</li>
+          <li>Teal Submit button for final action</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Confirmation step — clear summary, strong call to action.</div>
+      </div>
+    </div>
+
+    <!-- Submitted -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Application received</div>
+        <div class="body" style="text-align:center;">
+          <div class="ok">✓</div>
+          <div class="h">Thank you</div>
+          <div class="muted" style="margin:8px 0 14px;">Your account opening request is under review. We will notify you by SMS and email.</div>
+          <div class="fld" style="text-align:left;">Reference: USO-2026-00482<br/>Status: In review</div>
+          <div class="btn-p">Go to Home</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>8. Application received</h3>
+        <p>Success confirmation after KYC is submitted. Investor gets a reference number and status.</p>
+        <ul>
+          <li>Green success icon</li>
+          <li>SMS / email notification message</li>
+          <li>Button to open the pending home screen</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Positive confirmation — reassuring and simple.</div>
+      </div>
+    </div>
+
+    <!-- Pending home -->
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Home</div>
+        <div class="body">
+          <div class="muted" style="margin-bottom:2px;">Welcome</div>
+          <div class="h">Your account is under review</div>
+          <div class="fld" style="margin-top:8px;">
+            <span class="badge-warn">IN REVIEW</span>
+            <div style="margin-top:10px;font-weight:700;font-size:13px;">Account opening status</div>
+            <div class="muted" style="margin:6px 0 0;">
+              We received your application. You can browse funds while you wait.
+              Subscribe and redeem unlock after approval.
+            </div>
+            <div class="kv"><span class="muted" style="margin:0;">Reference</span><strong>USO-2026-00482</strong></div>
+            <div class="kv"><span class="muted" style="margin:0;">Status</span><strong>Under review</strong></div>
+            <div class="kv"><span class="muted" style="margin:0;">Typical time</span><strong>1–3 business days</strong></div>
+            <div class="kv"><span class="muted" style="margin:0;">Notification</span><strong>SMS and email</strong></div>
+          </div>
+          <div class="info-green">No action needed right now. We will notify you when your account is approved.</div>
+          <div class="row2">
+            <div class="tile off">Subscribe<small>After approval</small></div>
+            <div class="tile off">Redeem<small>After approval</small></div>
+          </div>
+          <div class="row2">
+            <div class="tile" style="flex:1;">Browse funds</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>9. Pending approval dashboard</h3>
+        <p>
+          Home screen while the investor waits for account approval.
+          Status is clear; investing is locked.
+        </p>
+        <ul>
+          <li>Yellow <strong>IN REVIEW</strong> status badge</li>
+          <li>Reference number, expected time, notification channel</li>
+          <li>Subscribe / Redeem shown but disabled</li>
+          <li>Browse funds still available</li>
+          <li>
+            No <strong>Documents</strong> button here —
+            Documents on the pending home was a shortcut to Factsheet / Prospectus.
+            Not needed there — those already sit on the landing screen and on each fund page — so it was removed.
+          </li>
+        </ul>
+        <div class="feel">Look &amp; feel: Informative waiting state — calm, clear, no confusion about next steps.</div>
+      </div>
+    </div>
+
+    <!-- Approved home — zero balance (just approved / no subscriptions yet) -->
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="home-ui">
+          <div class="home-top">
+            <div class="home-user">
+              <div class="home-av">U</div>
+              <div>
+                <div class="home-hi">Welcome</div>
+                <div class="home-name">Ahmed Al-Saidi</div>
+              </div>
+            </div>
+            <div class="home-tools">
+              <div class="home-pill"><b>EN</b> ع</div>
+            </div>
+          </div>
+          <div class="port">
+            <div class="lbl">TOTAL PORTFOLIO VALUE</div>
+            <div class="val">0.000 OMR</div>
+            <div class="chg flat">— 0.0%</div>
+            <div class="hint">Your account is approved. Subscribe to a fund to start investing.</div>
+            <svg width="120" height="36" viewBox="0 0 120 36"><path d="M0 18 H120" stroke="white" stroke-width="2" fill="none"/></svg>
+          </div>
+          <div class="acts">
+            <div class="act sub">+ Subscribe</div>
+            <div class="act red off">Redeem</div>
+          </div>
+          <div class="acts">
+            <div class="act sm">↻ SIP</div>
+            <div class="act sm">⏱ History</div>
+          </div>
+          <div class="feat-h">
+            <strong>Featured</strong>
+            <a href="#">See all</a>
+          </div>
+          <div class="fund-card">
+            <div class="fn">United US Markets Fund</div>
+            <div class="fc">International Equity</div>
+            <div class="yp">YTD +10.0%</div>
+          </div>
+          <div class="fund-card">
+            <div class="fn">United GCC Fund</div>
+            <div class="fc">GCC Equity</div>
+            <div class="yp">YTD +6.2%</div>
+          </div>
+          <div class="bnav">
+            <div class="on"><span>■</span>Home</div>
+            <div><span>□</span>Funds</div>
+            <div><span>□</span>Portfolio</div>
+            <div><span>□</span>History</div>
+            <div><span>□</span>Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>10. Home after approval — zero balance (0 OMR)</h3>
+        <p>
+          Home shown right after approval when the investor has <strong>no holdings yet</strong>
+          (just approved, or never subscribed).
+        </p>
+        <ul>
+          <li>Portfolio value shows <strong>0.000 OMR</strong></li>
+          <li>Performance shows flat <strong>0.0%</strong> (no gain/loss yet)</li>
+          <li>Short hint: account approved — subscribe to start</li>
+          <li><strong>Subscribe</strong> enabled · <strong>Redeem</strong> disabled (nothing to redeem)</li>
+          <li>Featured funds still visible to encourage first subscription</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same home design, empty state — clear next step is Subscribe.</div>
+      </div>
+    </div>
+
+    <!-- Approved home — with portfolio balance -->
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="home-ui">
+          <div class="home-top">
+            <div class="home-user">
+              <div class="home-av">U</div>
+              <div>
+                <div class="home-hi">Welcome</div>
+                <div class="home-name">Ahmed Al-Saidi</div>
+              </div>
+            </div>
+            <div class="home-tools">
+              <div class="home-pill"><b>EN</b> ع</div>
+            </div>
+          </div>
+          <div class="port">
+            <div class="lbl">TOTAL PORTFOLIO VALUE</div>
+            <div class="val">10,441 OMR</div>
+            <div class="chg">↗ +8.4%</div>
+            <svg width="120" height="36" viewBox="0 0 120 36"><path d="M0 28 C20 26, 40 10, 60 14 S100 8, 120 4" stroke="white" stroke-width="2" fill="none"/></svg>
+          </div>
+          <div class="acts">
+            <div class="act sub">+ Subscribe</div>
+            <div class="act red">Redeem</div>
+          </div>
+          <div class="acts">
+            <div class="act sm">↻ SIP</div>
+            <div class="act sm">⏱ History</div>
+          </div>
+          <div class="feat-h">
+            <strong>Featured</strong>
+            <a href="#">See all</a>
+          </div>
+          <div class="fund-card">
+            <div class="fn">United US Markets Fund</div>
+            <div class="fc">International Equity</div>
+            <div class="yp">YTD +10.0%</div>
+          </div>
+          <div class="fund-card">
+            <div class="fn">United GCC Fund</div>
+            <div class="fc">GCC Equity</div>
+            <div class="yp">YTD +6.2%</div>
+          </div>
+          <div class="bnav">
+            <div class="on"><span>■</span>Home</div>
+            <div><span>□</span>Funds</div>
+            <div><span>□</span>Portfolio</div>
+            <div><span>□</span>History</div>
+            <div><span>□</span>Profile</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>11. Home after approval — with balance</h3>
+        <p>
+          Same home layout after the investor has subscribed and holdings are confirmed.
+          Portfolio value and performance come from units × NAV (custodian data).
+        </p>
+        <ul>
+          <li>Portfolio value shows sample <strong>10,441 OMR</strong></li>
+          <li>Performance indicator e.g. <strong>+8.4%</strong></li>
+          <li><strong>Subscribe</strong> and <strong>Redeem</strong> both enabled</li>
+          <li>SIP, History, Featured funds, and bottom navigation</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same home as 0 OMR state — now with live portfolio values.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== FLOW B ===================== -->
+  <div class="section">
+    <div class="section-h">
+      <h2>Journey B — Already registered investor</h2>
+      <p>Same welcome and login → OTP → full Home immediately (no KYC, no waiting screen).</p>
+    </div>
+    <div class="path">
+      <span>Landing</span><span>Login</span><span>OTP</span><span>Home</span>
+      <span>Subscribe</span><span>Redeem</span><span>SIP</span><span>History</span><span>Profile</span>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image4.png" alt="Home dashboard" />
+      <div class="desc">
+        <h3>12. Home dashboard (returning investor)</h3>
+        <p>
+          Same approved home: portfolio value, Subscribe / Redeem,
+          SIP, History, and featured funds. Arabic remains available via the language toggle in-app.
+        </p>
+        <div class="feel">Look &amp; feel: Friendly investor home with clear portfolio focus.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image7.png" alt="Subscribe" />
+      <div class="desc">
+        <h3>13. Subscribe</h3>
+        <p>Step-by-step subscription: choose fund, amount, payment method, then confirm.</p>
+        <ul>
+          <li>One-time investment or SIP setup toggle</li>
+          <li>Card or bank transfer options</li>
+          <li>Total amount and confirm button</li>
+          <li>
+            <strong>Cut-off time</strong> shown for the selected fund
+            (demo: <strong>12:00 PM Muscat</strong>) —
+            orders before cut-off process for today’s NAV; after cut-off move to the next NAV date.
+            Exact times to be confirmed per fund with Gulf Custody.
+          </li>
+        </ul>
+        <div class="feel">Look &amp; feel: Guided investment flow with progress steps and soft teal highlights.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="phone-ui ui">
+        <div class="bar">Success</div>
+        <div class="body" style="text-align:center;">
+          <div class="ok">✓</div>
+          <div class="h">Subscription placed</div>
+          <div class="muted" style="margin:8px 0;">Reference: TXN1012</div>
+          <div class="fld" style="background:#e8d5b5;border:none;">Confirmation email and PDF will be sent to you</div>
+          <div class="btn-p" style="background:#fff;color:#0a1628;border:1px solid #e2e6ea;">View receipt</div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>14. Subscription success</h3>
+        <p>Confirms the order was placed and that a confirmation email / PDF will be sent to the investor.</p>
+        <div class="feel">Look &amp; feel: Simple success state — clear reference and next action.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image13.png" alt="SIP" />
+      <div class="desc">
+        <h3>15. SIP / recurring investment</h3>
+        <p>Set up monthly (or scheduled) investments into a selected fund.</p>
+        <ul>
+          <li>
+            <strong>Cut-off time</strong> applies to the first debit:
+            if set up before cut-off, first debit can run immediately; otherwise next business day.
+            Units allocate after payment verification and confirmation.
+          </li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same subscribe visual style with schedule options.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image15.png" alt="Redeem" />
+      <div class="desc">
+        <h3>16. Redeem</h3>
+        <p>Investor redeems units / amount from an existing holding.</p>
+        <ul>
+          <li>
+            <strong>Cut-off time</strong> shown (same rule as subscribe) —
+            also show next NAV / last synced time where available.
+          </li>
+        </ul>
+        <div class="feel">Look &amp; feel: Consistent with subscribe — clear amounts and confirmation.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image20.png" alt="History" />
+      <div class="desc">
+        <h3>17. Transaction history</h3>
+        <p>List of subscriptions, redemptions, and SIP runs with status.</p>
+        <div class="feel">Look &amp; feel: Timeline / list style — easy to scan past activity.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image21.png" alt="Portfolio" />
+      <div class="desc">
+        <h3>18. Portfolio</h3>
+        <p>Holdings overview — value by fund, units, and performance.</p>
+        <div class="feel">Look &amp; feel: Portfolio-focused cards and clear fund positions.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image23.png" alt="Fund details" />
+      <div class="desc">
+        <h3>19. Fund details</h3>
+        <p>Fund overview with NAV, performance, risk, cut-off time, and links to documents.</p>
+        <ul>
+          <li><strong>Cut-off time</strong> listed with fund facts (NAV, risk, currency)</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Product page style — tabs for overview, performance, documents.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image29.png" alt="Documents" />
+      <div class="desc">
+        <h3>20. Documents</h3>
+        <p>Factsheets, prospectus, and related investor documents for each fund.</p>
+        <div class="feel">Look &amp; feel: Document list with open / download actions.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image32.png" alt="Profile" />
+      <div class="desc">
+        <h3>21. Profile &amp; security</h3>
+        <p>Investor profile, bank account, biometric login, language, and documents.</p>
+        <div class="feel">Look &amp; feel: Settings-style screen — organised rows and toggles.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <img class="phone-img" src="mobile-screens/assets/image35.png" alt="Notifications" />
+      <div class="desc">
+        <h3>22. Notifications</h3>
+        <p>Inbox for order updates, NAV notices, and account messages.</p>
+        <div class="feel">Look &amp; feel: Simple notification list with unread indicators.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="footer-note">
+    United Securities · Investor Mobile App · Screen review for client confirmation
+  </p>
+
+</div>
+</body>
+</html>
