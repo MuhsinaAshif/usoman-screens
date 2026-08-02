@@ -935,6 +935,29 @@ function selectInv(i) { selectedInv = i; renderInvestors(); }
 function renderInvDetail() {
   const i = investors[selectedInv];
   if (!i) return;
+  const invSips = sips.filter(s => s.inv === i.name);
+  const sipBlock = invSips.length
+    ? invSips.map(s => {
+        const sipIdx = sips.indexOf(s);
+        return `
+      <div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fafbfc">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+          <b style="font-size:12px">${s.id}</b>
+          ${pill(s.status)}
+        </div>
+        <div class="kv"><span>Fund</span><b>${s.fund}</b></div>
+        <div class="kv"><span>Amount</span><b>${s.amount}</b></div>
+        <div class="kv"><span>Frequency</span><b>${s.freq}${s.day ? ' · day ' + s.day : ''}</b></div>
+        <div class="kv"><span>Start</span><b>${s.start}</b></div>
+        <div class="kv"><span>End</span><b>${s.end}</b></div>
+        <div class="kv"><span>Next run</span><b>${s.next}</b></div>
+        <div class="kv"><span>Last run</span><b>${s.lastRun} · ${s.lastResult}</b></div>
+        <a class="link" href="#" onclick="openInvestorSip(${sipIdx});return false;">Open SIP detail →</a>
+      </div>`;
+      }).join('')
+    : `<div class="kv"><span>No SIP mandates</span><b>—</b></div>
+       <p style="font-size:11px;color:var(--muted);margin-top:4px">Investor has not set up a recurring investment.</p>`;
+
   document.getElementById('invDetail').innerHTML = `
     <h3>${i.name}</h3>
     <div class="sub">${i.id} · ${i.ref}</div>
@@ -944,6 +967,8 @@ function renderInvDetail() {
     <div class="kv"><span>Email</span><b>${i.email}</b></div>
     <div class="kv"><span>Bank</span><b>${i.bank}</b></div>
     <div class="kv"><span>Primary fund</span><b>${i.fund}</b></div>
+    <div class="section-label">SIP / Recurring (${invSips.length})</div>
+    ${sipBlock}
     <div class="section-label">KYC (read-only)</div>
     <div class="kv"><span>Status</span><b>${i.kyc}</b></div>
     <div class="kv"><span>Last GCC sync</span><b>${i.sync}</b></div>
@@ -956,6 +981,11 @@ function renderInvDetail() {
     <div class="kv"><span>Proof of address</span><b>View</b></div>
     <div class="kv"><span>Bank letter</span><b>View</b></div>
   `;
+}
+
+function openInvestorSip(sipIdx) {
+  selectedSip = sipIdx;
+  go('sip');
 }
 
 function renderTx() {
