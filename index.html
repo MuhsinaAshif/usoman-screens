@@ -645,18 +645,124 @@
     </div>
 
     <div class="screen">
-      <img class="phone-img" src="mobile-screens/assets/image13.png" alt="SIP" />
+      <img class="phone-img" src="mobile-screens/assets/image13.png" alt="SIP setup reference" />
       <div class="desc">
-        <h3>15. SIP / recurring investment</h3>
-        <p>Set up monthly (or scheduled) investments into a selected fund.</p>
+        <h3>15. SIP setup (reference design)</h3>
+        <p>Original visual for creating a scheduled investment into a selected fund.</p>
         <ul>
-          <li>
-            <strong>Cut-off time</strong> applies to the first debit:
-            if set up before cut-off, first debit can run immediately; otherwise next business day.
-            Units allocate after payment verification and confirmation.
-          </li>
+          <li><strong>Cut-off time</strong> applies to the first debit.</li>
+          <li>Units allocate after payment verification and confirmation.</li>
         </ul>
         <div class="feel">Look &amp; feel: Same subscribe visual style with schedule options.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="ui">
+          <div class="bar">My SIPs</div>
+          <div class="body">
+            <div class="muted">Recurring investments you control — pause, resume, or cancel anytime.</div>
+            <div class="fld" style="border-left:3px solid #14b8a6">
+              <label>United GCC Fund · Active</label>
+              <b>200 OMR / Monthly</b>
+              <div class="muted" style="margin:4px 0 0">Next debit: 05 Aug 2026 · Ends: 05 Aug 2027</div>
+            </div>
+            <div class="fld" style="border-left:3px solid #f59e0b">
+              <label>United US Markets · Paused</label>
+              <b>500 OMR / Monthly</b>
+              <div class="muted" style="margin:4px 0 0">No debit while paused</div>
+            </div>
+            <div class="btn-s">+ New SIP</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>15a. My SIPs list</h3>
+        <p>Investor sees all SIP mandates with status and next debit date.</p>
+        <ul>
+          <li><strong>Active</strong> — will debit on next scheduled date</li>
+          <li><strong>Paused</strong> — kept, but no new runs</li>
+          <li>CTA opens Create SIP</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Simple card list — status colour on the left edge.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="ui">
+          <div class="bar">Create SIP</div>
+          <div class="body">
+            <div class="fld"><label>Fund</label>United GCC Fund</div>
+            <div class="fld"><label>Amount</label>200 OMR</div>
+            <div class="fld"><label>Frequency</label>Monthly</div>
+            <div class="fld"><label>Day of month</label>5</div>
+            <div class="fld"><label>Start date</label>05 Aug 2026</div>
+            <div class="fld"><label>End date (optional)</label>05 Aug 2027</div>
+            <div class="info-green">First debit on/after start date when day matches. Ends on End date, max installments, or Cancel.</div>
+            <div class="btn-p">Confirm SIP</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>15b. Create SIP</h3>
+        <p>Investor sets fund, amount, schedule, start, and optional end.</p>
+        <ul>
+          <li><strong>Starts:</strong> first matching day on/after Start date</li>
+          <li><strong>Ends:</strong> End date, max installments, Cancel, or Completed</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same form style as subscribe / KYC steps.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="ui">
+          <div class="bar">SIP details</div>
+          <div class="body">
+            <div class="badge-warn">Active</div>
+            <div class="h" style="margin-top:8px">United GCC Fund</div>
+            <div class="muted">200 OMR · Monthly · Day 5</div>
+            <div class="fld"><label>Start</label>05 Aug 2026</div>
+            <div class="fld"><label>End</label>05 Aug 2027</div>
+            <div class="fld"><label>Next run</label>05 Aug 2026</div>
+            <div class="fld"><label>Last run</label>— · not yet</div>
+            <div class="row2">
+              <div class="tile">Pause</div>
+              <div class="tile">Cancel</div>
+            </div>
+            <div class="btn-s" style="background:#0a1628">View run history</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>15c. SIP detail</h3>
+        <p>Investor manages one mandate — pause, resume, cancel.</p>
+        <ul>
+          <li>Pause → no new debits until Resume</li>
+          <li>Cancel → status Cancelled, no more runs</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Detail card with clear primary actions.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="phone-ui">
+        <div class="ui">
+          <div class="bar">SIP history</div>
+          <div class="body">
+            <div class="muted">Each SIP run creates a normal subscription order.</div>
+            <div class="fld"><label>01 Jul 2026 · Failed</label>Order SIP-87 · Payment variance</div>
+            <div class="fld"><label>01 Jun 2026 · Success</label>Order TXN0891 · Units allocated</div>
+            <div class="fld"><label>01 May 2026 · Success</label>Order TXN0810 · First debit</div>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>15d. SIP run history</h3>
+        <p>Past scheduled debits with Success / Failed / Skipped and linked order refs.</p>
+        <div class="feel">Look &amp; feel: Same list pattern as transaction history.</div>
       </div>
     </div>
 

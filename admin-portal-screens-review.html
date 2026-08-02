@@ -726,6 +726,73 @@
     </div>
   </div>
 
+  <!-- 07b SIP -->
+  <div class="section">
+    <div class="section-h">
+      <h2>7b. SIP / Recurring Investments</h2>
+      <p>Dedicated SIP mandates page — start date, end rules, pause/resume/cancel, and execution history.</p>
+    </div>
+    <div class="screen">
+      <div class="desk">
+        <div class="desk-chrome">
+          <div class="mark"><i>U</i> United Securities Admin</div>
+          <div class="user">Ops</div>
+        </div>
+        <div class="desk-body">
+          <div class="side">
+            <div class="nav">Dashboard</div>
+            <div class="nav">Investors</div>
+            <div class="nav">Transactions</div>
+            <div class="nav on">SIP</div>
+            <div class="nav">Funds</div>
+            <div class="nav">Documents</div>
+            <div class="nav">Reports</div>
+            <div class="nav">Notifications</div>
+            <div class="nav">Integration Health</div>
+            <div class="nav">Audit</div>
+            <div class="nav">Settings</div>
+          </div>
+          <div class="main">
+            <div class="main-h">
+              <h4>SIP / Recurring Investments</h4>
+              <span class="btn-o">Export</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <div class="stat"><div class="l">Active</div><div class="v">2</div></div>
+              <div class="stat"><div class="l">Paused</div><div class="v">1</div></div>
+              <div class="stat"><div class="l">Due today</div><div class="v">1</div></div>
+              <div class="stat"><div class="l">Failed</div><div class="v">1</div></div>
+            </div>
+            <table class="data">
+              <thead><tr><th>SIP</th><th>Investor</th><th>Fund</th><th>Amount</th><th>Start</th><th>End</th><th>Next</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>SIP-1001</td><td>Ahmed Al-Saidi</td><td>E71</td><td>200 OMR</td><td>05 Aug</td><td>05 Aug 27</td><td>05 Aug</td><td><span class="pill ok">Active</span></td></tr>
+                <tr><td>SIP-1002</td><td>Omar Al-Hinai</td><td>E71</td><td>200 OMR</td><td>01 May</td><td>—</td><td>01 Aug</td><td><span class="pill ok">Active</span></td></tr>
+                <tr><td>SIP-1003</td><td>Yousuf Al-Riyami</td><td>E59</td><td>500 OMR</td><td>15 Jan</td><td>15 Jan 27</td><td>—</td><td><span class="pill warn">Paused</span></td></tr>
+                <tr><td>SIP-1004</td><td>Fatima Al-Lawati</td><td>E71</td><td>100 OMR</td><td>01 Mar</td><td>01 Jun</td><td>—</td><td><span class="pill muted">Completed</span></td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:var(--muted)">
+              <strong>Start:</strong> first debit on/after start date on the schedule day.
+              <strong>End:</strong> Cancel, End date, or Completed after last installment.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="desc">
+        <h3>7b. SIP mandates</h3>
+        <p>Ops monitor all recurring investment mandates. Each due run creates a normal subscription for GCC.</p>
+        <ul>
+          <li>Sidebar tab <strong>SIP</strong> (also in interactive demo)</li>
+          <li>Detail panel: schedule, next run, execution history</li>
+          <li>Actions: Pause / Resume / Cancel (with reason in live build)</li>
+          <li>Live interactive page: <a href="admin-portal-demo.html">admin-portal-demo.html</a> → SIP</li>
+        </ul>
+        <div class="feel">Look &amp; feel: Same ops table + detail panel as Investors.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- 08 Investors -->
   <div class="section">
     <div class="section-h">

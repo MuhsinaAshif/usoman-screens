@@ -292,6 +292,7 @@
       <button class="active" data-page="dashboard"><span class="ico">▣</span> Dashboard</button>
       <button data-page="investors"><span class="ico">☺</span> Investors</button>
       <button data-page="transactions"><span class="ico">⇄</span> Transactions</button>
+      <button data-page="sip"><span class="ico">↻</span> SIP</button>
       <button data-page="funds"><span class="ico">◆</span> Funds</button>
       <button data-page="documents"><span class="ico">▤</span> Documents</button>
       <button data-page="reports"><span class="ico">▥</span> Reports</button>
@@ -428,6 +429,66 @@
             <thead><tr><th style="padding-left:16px">Reference</th><th>Investor</th><th>Fund</th><th>Type</th><th>Amount (OMR)</th><th>Cut-off</th><th>GCC Status</th><th>Date</th></tr></thead>
             <tbody id="txBody"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- SIP -->
+      <section class="page" id="page-sip">
+        <div class="page-h">
+          <div>
+            <h1>SIP / Recurring Investments</h1>
+            <p>Channel-owned SIP mandates. Each due run creates a normal subscription order for Gulf Custody.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost" onclick="toast('SIP list exported (demo)')">↓ Export</button>
+          </div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Active SIPs</div><div class="v" id="sipKpiActive">0</div><div class="d">Running on schedule</div></div>
+          <div class="kpi"><div class="l">Paused</div><div class="v" id="sipKpiPaused">0</div><div class="d">No new debits</div></div>
+          <div class="kpi"><div class="l">Due today</div><div class="v" id="sipKpiDue">0</div><div class="d">Next collection window</div></div>
+          <div class="kpi"><div class="l">Failed last run</div><div class="v" id="sipKpiFailed">0</div><div class="d">Needs ops follow-up</div></div>
+        </div>
+        <div class="filters">
+          <select id="sipStatus">
+            <option value="">All statuses</option>
+            <option>Active</option>
+            <option>Paused</option>
+            <option>Cancelled</option>
+            <option>Completed</option>
+          </select>
+          <select id="sipFund">
+            <option value="">All funds</option>
+            <option>United GCC Fund</option>
+            <option>United US Markets Fund</option>
+          </select>
+          <select id="sipFreq">
+            <option value="">All frequencies</option>
+            <option>Monthly</option>
+            <option>Weekly</option>
+            <option>Quarterly</option>
+          </select>
+        </div>
+        <div class="invest-layout">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="padding-left:16px">SIP Ref</th>
+                  <th>Investor</th>
+                  <th>Fund</th>
+                  <th>Amount</th>
+                  <th>Frequency</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Next run</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sipBody"></tbody>
+            </table>
+          </div>
+          <aside class="detail" id="sipDetail"></aside>
         </div>
       </section>
 
@@ -658,6 +719,54 @@ const exceptions = [
   { ref:'SIP-87', type:'SIP Collection', ch:'200.000', gcc:'195.000', var:'5.000', status:'Exception' },
 ];
 
+const sips = [
+  {
+    id: 'SIP-1001', inv: 'Ahmed Al-Saidi', mobile: '+968 9123 4567', fund: 'United GCC Fund',
+    amount: '200 OMR', freq: 'Monthly', day: 5, start: '05 Aug 2026', end: '05 Aug 2027',
+    next: '05 Aug 2026', status: 'Active', lastRun: '—', lastResult: '—', dueToday: true,
+    runs: [
+      { date: '05 Aug 2026', order: '—', result: 'Scheduled', note: 'First debit pending cut-off' }
+    ]
+  },
+  {
+    id: 'SIP-1002', inv: 'Omar Al-Hinai', mobile: '+968 9555 7788', fund: 'United GCC Fund',
+    amount: '200 OMR', freq: 'Monthly', day: 1, start: '01 May 2026', end: '—',
+    next: '01 Aug 2026', status: 'Active', lastRun: '01 Jul 2026', lastResult: 'Failed', dueToday: false,
+    runs: [
+      { date: '01 Jul 2026', order: 'SIP-87', result: 'Failed', note: 'Payment variance vs GCC' },
+      { date: '01 Jun 2026', order: 'TXN0891', result: 'Success', note: 'Units allocated' },
+      { date: '01 May 2026', order: 'TXN0810', result: 'Success', note: 'First debit' }
+    ]
+  },
+  {
+    id: 'SIP-1003', inv: 'Yousuf Al-Riyami', mobile: '+968 9777 6655', fund: 'United US Markets Fund',
+    amount: '500 OMR', freq: 'Monthly', day: 15, start: '15 Jan 2026', end: '15 Jan 2027',
+    next: '—', status: 'Paused', lastRun: '15 Jul 2026', lastResult: 'Success', dueToday: false,
+    runs: [
+      { date: '15 Jul 2026', order: 'TXN0990', result: 'Success', note: 'Paused after this run' },
+      { date: '15 Jun 2026', order: 'TXN0922', result: 'Success', note: '' }
+    ]
+  },
+  {
+    id: 'SIP-1004', inv: 'Fatima Al-Lawati', mobile: '+968 9333 4411', fund: 'United GCC Fund',
+    amount: '100 OMR', freq: 'Weekly', day: null, start: '01 Mar 2026', end: '01 Jun 2026',
+    next: '—', status: 'Completed', lastRun: '01 Jun 2026', lastResult: 'Success', dueToday: false,
+    runs: [
+      { date: '01 Jun 2026', order: 'TXN0901', result: 'Success', note: 'End date reached' },
+      { date: '25 May 2026', order: 'TXN0877', result: 'Success', note: '' }
+    ]
+  },
+  {
+    id: 'SIP-1005', inv: 'Sara Al-Balushi', mobile: '+968 9900 1122', fund: 'United US Markets Fund',
+    amount: '150 OMR', freq: 'Quarterly', day: 10, start: '10 Apr 2026', end: '—',
+    next: '—', status: 'Cancelled', lastRun: '10 Apr 2026', lastResult: 'Success', dueToday: false,
+    runs: [
+      { date: '10 Apr 2026', order: 'TXN0755', result: 'Success', note: 'Cancelled by investor' }
+    ]
+  }
+];
+let selectedSip = 0;
+
 const audits = [
   { t:'29 Jul 15:02', u:'fatima@usoman.com', a:'Published document', e:'E71 Factsheet', s:'Admin' },
   { t:'29 Jul 14:40', u:'fatima@usoman.com', a:'Updated cut-off', e:'E59 → 12:00', s:'Admin' },
@@ -668,9 +777,9 @@ const audits = [
 
 function pill(status) {
   let cls = 'muted';
-  if (/Processed|Verified|Active|Live|Healthy|OK|Matched/i.test(status)) cls = 'ok';
-  else if (/Pending|In Progress|In review|Update|Degraded/i.test(status)) cls = 'warn';
-  else if (/Failed|Exception|Action|Restricted/i.test(status)) cls = 'danger';
+  if (/Processed|Verified|Active|Live|Healthy|OK|Matched|Success|Completed/i.test(status)) cls = 'ok';
+  else if (/Pending|In Progress|In review|Update|Degraded|Paused|Scheduled/i.test(status)) cls = 'warn';
+  else if (/Failed|Exception|Action|Restricted|Cancelled/i.test(status)) cls = 'danger';
   else if (/Subscription/i.test(status)) cls = 'navy';
   return `<span class="pill ${cls}">${status}</span>`;
 }
@@ -689,6 +798,101 @@ function go(page) {
     b.classList.toggle('active', b.dataset.page === page);
   });
   if (page === 'dashboard') setTimeout(renderCharts, 50);
+  if (page === 'sip') renderSips();
+}
+
+function renderSips() {
+  const st = document.getElementById('sipStatus').value;
+  const fund = document.getElementById('sipFund').value;
+  const freq = document.getElementById('sipFreq').value;
+  const rows = sips.filter(s =>
+    (!st || s.status === st) &&
+    (!fund || s.fund === fund) &&
+    (!freq || s.freq === freq)
+  );
+  document.getElementById('sipKpiActive').textContent = sips.filter(s => s.status === 'Active').length;
+  document.getElementById('sipKpiPaused').textContent = sips.filter(s => s.status === 'Paused').length;
+  document.getElementById('sipKpiDue').textContent = sips.filter(s => s.dueToday && s.status === 'Active').length;
+  document.getElementById('sipKpiFailed').textContent = sips.filter(s => s.lastResult === 'Failed').length;
+
+  document.getElementById('sipBody').innerHTML = rows.map(s => {
+    const idx = sips.indexOf(s);
+    return `<tr class="clickable ${idx===selectedSip?'selected':''}" onclick="selectSip(${idx})">
+      <td style="padding-left:16px"><b>${s.id}</b></td>
+      <td>${s.inv}</td>
+      <td>${s.fund}</td>
+      <td>${s.amount}</td>
+      <td>${s.freq}${s.day ? ' · day ' + s.day : ''}</td>
+      <td>${s.start}</td>
+      <td>${s.end}</td>
+      <td>${s.next}</td>
+      <td>${pill(s.status)}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="9" style="padding:16px;color:var(--muted)">No SIP mandates match filters.</td></tr>`;
+  renderSipDetail();
+}
+
+function selectSip(idx) {
+  selectedSip = idx;
+  renderSips();
+}
+
+function renderSipDetail() {
+  const s = sips[selectedSip];
+  if (!s) {
+    document.getElementById('sipDetail').innerHTML = '<p style="color:var(--muted);font-size:13px">Select a SIP mandate.</p>';
+    return;
+  }
+  const canPause = s.status === 'Active';
+  const canResume = s.status === 'Paused';
+  const canCancel = s.status === 'Active' || s.status === 'Paused';
+  document.getElementById('sipDetail').innerHTML = `
+    <h3>${s.id}</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">${s.inv} · ${s.mobile}</p>
+    <div style="margin-bottom:10px">${pill(s.status)}</div>
+    <div class="kv"><span>Fund</span><b>${s.fund}</b></div>
+    <div class="kv"><span>Amount</span><b>${s.amount}</b></div>
+    <div class="kv"><span>Frequency</span><b>${s.freq}${s.day ? ' (day ' + s.day + ')' : ''}</b></div>
+    <div class="kv"><span>Starts</span><b>${s.start}</b></div>
+    <div class="kv"><span>Ends</span><b>${s.end}</b></div>
+    <div class="kv"><span>Next run</span><b>${s.next}</b></div>
+    <div class="kv"><span>Last run</span><b>${s.lastRun} · ${s.lastResult}</b></div>
+    <div style="margin:14px 0 8px;font-size:12px;font-weight:700;color:var(--navy)">Execution history</div>
+    <table>
+      <thead><tr><th>Date</th><th>Order</th><th>Result</th></tr></thead>
+      <tbody>
+        ${s.runs.map(r => `<tr>
+          <td>${r.date}</td>
+          <td>${r.order}</td>
+          <td>${pill(r.result)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="actions" style="margin-top:14px;flex-wrap:wrap">
+      ${canPause ? `<button class="btn btn-ghost" onclick="sipAction('Paused')">Pause</button>` : ''}
+      ${canResume ? `<button class="btn btn-navy" onclick="sipAction('Active')">Resume</button>` : ''}
+      ${canCancel ? `<button class="btn btn-ghost" onclick="sipAction('Cancelled')">Cancel</button>` : ''}
+      <button class="btn btn-ghost" onclick="toast('Opened investor ${s.inv} (demo)')">Investor</button>
+    </div>
+    <div class="note-box" style="margin-top:12px;font-size:11px">
+      <b>Start:</b> first debit on/after start date on the schedule day.<br/>
+      <b>End:</b> Cancel, End date, or Completed after last installment.
+    </div>
+  `;
+}
+
+function sipAction(status) {
+  const s = sips[selectedSip];
+  if (!s) return;
+  s.status = status;
+  if (status === 'Paused' || status === 'Cancelled') {
+    s.next = '—';
+    s.dueToday = false;
+  } else if (status === 'Active') {
+    s.next = '01 Sep 2026';
+  }
+  toast(s.id + ' → ' + status + ' (demo)');
+  renderSips();
 }
 
 document.getElementById('nav').addEventListener('click', (e) => {
@@ -886,6 +1090,9 @@ document.getElementById('invKyc').addEventListener('change', renderInvestors);
 document.getElementById('invFund').addEventListener('change', renderInvestors);
 document.getElementById('txType').addEventListener('change', renderTx);
 document.getElementById('txStatus').addEventListener('change', renderTx);
+document.getElementById('sipStatus').addEventListener('change', renderSips);
+document.getElementById('sipFund').addEventListener('change', renderSips);
+document.getElementById('sipFreq').addEventListener('change', renderSips);
 document.getElementById('globalSearch').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { go('investors'); document.getElementById('invSearch').value = e.target.value; renderInvestors(); }
 });
@@ -908,6 +1115,7 @@ dz.addEventListener('drop', (e) => {
 renderDashTx();
 renderInvestors();
 renderTx();
+renderSips();
 renderFunds();
 renderDocs();
 renderReports();
