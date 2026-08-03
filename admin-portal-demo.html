@@ -374,10 +374,6 @@
     <div class="login-err" id="loginErr"></div>
     <div class="login-step active" id="loginStepPassword">
       <div class="modal-f">
-        <label>API base URL</label>
-        <input type="text" id="loginApiBase" value="http://84.54.23.29:5055" />
-      </div>
-      <div class="modal-f">
         <label>Username</label>
         <input type="text" id="loginUser" value="admin" autocomplete="username" />
       </div>
@@ -1150,11 +1146,10 @@ function closeTplModal() {
 let loginChallengeId = null;
 let loginUsernamePending = '';
 
+const ADMIN_API_BASE = 'http://84.54.23.29:5055';
+
 function apiBase() {
-  const fromLogin = document.getElementById('loginApiBase');
-  const saved = localStorage.getItem('adminApiBase');
-  const value = (fromLogin && fromLogin.value) || saved || 'http://84.54.23.29:5055';
-  return String(value).replace(/\/$/, '');
+  return ADMIN_API_BASE;
 }
 
 function tplToken() {
@@ -1177,7 +1172,6 @@ function showLoginScreen() {
 }
 
 function enterApp(displayName, role, silent) {
-  localStorage.setItem('adminApiBase', apiBase());
   document.body.classList.remove('locked');
   document.getElementById('loginScreen').classList.remove('open');
   const name = displayName || localStorage.getItem('adminDisplayName') || 'Operations Admin';
