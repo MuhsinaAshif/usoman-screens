@@ -352,7 +352,14 @@
     .login-err.show { display: block; }
     .login-step { display: none; }
     .login-step.active { display: block; }
-    .login-hint { font-size: 11px; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.4; }
+    .login-hint { font-size: 12px; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.45; }
+    .login-welcome { font-size: 14px; color: var(--ink); text-align: center; margin-bottom: 18px; font-weight: 500; }
+    .login-card input::placeholder { color: #94a3b8; }
+    .login-showpass {
+      display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
+      margin: -4px 0 12px; cursor: pointer; user-select: none;
+    }
+    .login-showpass input { width: auto; }
     body.locked .app { display: none !important; }
     .top-actions { flex-wrap: wrap; }
     .btn-logout {
@@ -371,30 +378,30 @@
       <h1>UNITED SECURITIES</h1>
       <p>Fund Management · Admin Portal</p>
     </div>
+    <p class="login-welcome" id="loginWelcome">Welcome back. Sign in to continue.</p>
     <div class="login-err" id="loginErr"></div>
     <div class="login-step active" id="loginStepPassword">
       <div class="modal-f">
-        <label>Username</label>
-        <input type="text" id="loginUser" value="admin" autocomplete="username" />
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" value="admin" placeholder="Enter your username" autocomplete="username" />
       </div>
       <div class="modal-f">
-        <label>Password</label>
-        <input type="password" id="loginPass" value="Admin@123" autocomplete="current-password" />
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" value="Admin@123" placeholder="Enter your password" autocomplete="current-password" />
       </div>
+      <label class="login-showpass"><input type="checkbox" id="loginShowPass" onchange="toggleLoginPassword()" /> Show password</label>
       <button class="btn btn-gold" type="button" id="loginBtn" onclick="submitAdminLogin()">Sign in</button>
-      <p class="login-hint">Uses <code>POST /api/v1/admin/auth/login</code>. If OTP is required for the user, you will be asked next.</p>
+      <p class="login-hint">Need help? Contact your system administrator.</p>
     </div>
     <div class="login-step" id="loginStepOtp">
-      <p style="font-size:13px;color:var(--ink);margin-bottom:12px;">
-        Enter the SMS OTP sent to the admin mobile.
-        <span id="loginOtpHint" style="display:block;margin-top:6px;color:var(--muted);font-size:12px;"></span>
-      </p>
+      <p class="login-welcome" style="margin-bottom:12px;">We sent a one-time code to your registered mobile number.</p>
+      <p id="loginOtpHint" class="login-hint" style="margin:0 0 14px;text-align:left;"></p>
       <div class="modal-f">
-        <label>OTP</label>
-        <input type="text" id="loginOtp" inputmode="numeric" autocomplete="one-time-code" placeholder="1234" />
+        <label for="loginOtp">One-time code</label>
+        <input type="text" id="loginOtp" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 4–6 digit code" maxlength="8" />
       </div>
-      <button class="btn btn-gold" type="button" onclick="submitAdminOtp()">Verify OTP</button>
-      <button class="btn btn-ghost" type="button" style="margin-top:8px;" onclick="backToPasswordLogin()">Back</button>
+      <button class="btn btn-gold" type="button" id="otpBtn" onclick="submitAdminOtp()">Continue</button>
+      <button class="btn btn-ghost" type="button" style="margin-top:8px;" onclick="backToPasswordLogin()">Use a different account</button>
     </div>
   </div>
 </div>
@@ -721,16 +728,15 @@
         <div class="page-h">
           <div>
             <h1>Notifications</h1>
-            <p>Channel matrix + template content from <code>notifications.notification_templates</code>.</p>
+            <p>Choose which messages go by SMS, email, or push — and edit the wording.</p>
           </div>
           <div class="actions">
             <button class="btn btn-ghost" type="button" onclick="loadNotificationTemplates()">Refresh</button>
-            <button class="btn btn-gold" type="button" onclick="editNotificationTemplate(0)">Edit first</button>
+            <button class="btn btn-gold" type="button" onclick="editNotificationTemplate(0)">Edit OTP template</button>
           </div>
         </div>
         <div class="api-bar">
-          <button class="btn btn-navy" type="button" onclick="loadNotificationTemplates()">Load from API</button>
-          <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;"></span>
+          <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;">Signed-in templates load automatically.</span>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
           <table>
@@ -748,8 +754,8 @@
           </table>
         </div>
         <div class="note-box" style="margin-top:12px;">
-          Placeholders: <code>{OTP}</code>, <code>{MINUTES}</code>, <code>{DISPLAY_NAME}</code>, <code>{FUND_NAME}</code>, <code>{NAV}</code>.
-          Saving calls <code>POST /api/v1/admin/notification-templates/{eventKey}/update</code>.
+          Tip: you can use placeholders in the text such as <b>{OTP}</b>, <b>{MINUTES}</b>, or <b>{DISPLAY_NAME}</b>.
+          These are filled in automatically when the message is sent.
         </div>
       </section>
 
@@ -1156,10 +1162,40 @@ function tplToken() {
   return localStorage.getItem('adminAccessToken') || '';
 }
 
+function friendlyLoginError(raw) {
+  const msg = String(raw || '').toLowerCase();
+  if (!raw) return 'Something went wrong. Please try again.';
+  if (msg.includes('failed to fetch') || msg.includes('network')) {
+    return 'Unable to reach the server. Check your connection and try again.';
+  }
+  if (msg.includes('invalid') && (msg.includes('credential') || msg.includes('password') || msg.includes('username'))) {
+    return 'Incorrect username or password.';
+  }
+  if (msg.includes('invalid') && msg.includes('otp')) {
+    return 'That code is incorrect or has expired. Please try again.';
+  }
+  if (msg.includes('locked')) {
+    return 'This account is temporarily locked. Please try again later.';
+  }
+  if (msg.includes('disabled')) {
+    return 'Admin login is currently unavailable.';
+  }
+  if (msg.includes('mobile')) {
+    return 'A mobile number is required for verification. Please contact your administrator.';
+  }
+  return String(raw);
+}
+
 function showLoginError(msg) {
   const el = document.getElementById('loginErr');
   el.textContent = msg || '';
   el.classList.toggle('show', !!msg);
+}
+
+function toggleLoginPassword() {
+  const input = document.getElementById('loginPass');
+  const show = document.getElementById('loginShowPass').checked;
+  input.type = show ? 'text' : 'password';
 }
 
 function showLoginScreen() {
@@ -1167,6 +1203,7 @@ function showLoginScreen() {
   document.getElementById('loginScreen').classList.add('open');
   document.getElementById('loginStepPassword').classList.add('active');
   document.getElementById('loginStepOtp').classList.remove('active');
+  document.getElementById('loginWelcome').textContent = 'Welcome back. Sign in to continue.';
   loginChallengeId = null;
   showLoginError('');
 }
@@ -1215,6 +1252,10 @@ async function submitAdminLogin() {
   const username = document.getElementById('loginUser').value.trim();
   const password = document.getElementById('loginPass').value;
   showLoginError('');
+  if (!username || !password) {
+    showLoginError('Please enter your username and password.');
+    return;
+  }
   const btn = document.getElementById('loginBtn');
   btn.disabled = true;
   btn.textContent = 'Signing in…';
@@ -1224,29 +1265,30 @@ async function submitAdminLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     const data = json.data || json;
     if (!res.ok) throw new Error(json.message || data.message || 'Invalid credentials');
 
     if (data.otpRequired) {
       loginChallengeId = data.challengeId;
       loginUsernamePending = username;
+      document.getElementById('loginWelcome').textContent = 'Almost there';
       document.getElementById('loginStepPassword').classList.remove('active');
       document.getElementById('loginStepOtp').classList.add('active');
-      const hint = data.otp
-        ? ('Dev OTP: ' + data.otp)
-        : (data.otpExpiresAtUtc ? ('Expires ' + data.otpExpiresAtUtc) : 'Check SMS for the code');
-      document.getElementById('loginOtpHint').textContent = hint;
+      document.getElementById('loginOtpHint').textContent = data.otp
+        ? ('For testing, your code is ' + data.otp)
+        : 'Enter the code from your SMS message.';
       document.getElementById('loginOtp').value = data.otp || '';
-      toast('OTP required');
+      document.getElementById('loginOtp').focus();
+      toast('Enter the verification code');
       return;
     }
 
-    if (!data.accessToken) throw new Error('No access token returned');
+    if (!data.accessToken) throw new Error('Sign-in did not complete. Please try again.');
     localStorage.setItem('adminAccessToken', data.accessToken);
     enterApp(data.displayName, data.role);
   } catch (err) {
-    showLoginError(String(err.message || err));
+    showLoginError(friendlyLoginError(err.message || err));
   } finally {
     btn.disabled = false;
     btn.textContent = 'Sign in';
@@ -1257,10 +1299,18 @@ async function submitAdminOtp() {
   const base = apiBase();
   const otp = document.getElementById('loginOtp').value.trim();
   showLoginError('');
-  if (!loginChallengeId || !otp) {
-    showLoginError('Challenge and OTP are required.');
+  if (!otp) {
+    showLoginError('Please enter the code sent to your mobile.');
     return;
   }
+  if (!loginChallengeId) {
+    showLoginError('Your session expired. Please sign in again.');
+    backToPasswordLogin();
+    return;
+  }
+  const btn = document.getElementById('otpBtn');
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
   try {
     const res = await fetch(base + '/api/v1/admin/auth/verify-login-otp', {
       method: 'POST',
@@ -1271,22 +1321,25 @@ async function submitAdminOtp() {
         otp
       })
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     const data = json.data || json;
     if (!res.ok) throw new Error(json.message || data.message || 'Invalid OTP');
-    if (!data.accessToken) throw new Error('No access token returned');
+    if (!data.accessToken) throw new Error('Sign-in did not complete. Please try again.');
     localStorage.setItem('adminAccessToken', data.accessToken);
     enterApp(data.displayName, data.role);
   } catch (err) {
-    showLoginError(String(err.message || err));
+    showLoginError(friendlyLoginError(err.message || err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue';
   }
 }
 
 async function loadNotificationTemplates() {
   const status = document.getElementById('tplApiStatus');
   const token = tplToken();
-  if (!token) {
-    if (status) status.textContent = 'Demo data (login to load from API)';
+    if (!token) {
+    if (status) status.textContent = 'Showing sample templates. Sign in to load live data.';
     renderNotifications();
     return;
   }
@@ -1636,8 +1689,6 @@ renderCharts();
 renderNotifications();
 
 (function bootAuth() {
-  const savedBase = localStorage.getItem('adminApiBase');
-  if (savedBase) document.getElementById('loginApiBase').value = savedBase;
   document.getElementById('loginPass').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submitAdminLogin();
   });
