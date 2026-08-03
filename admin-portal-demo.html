@@ -353,7 +353,14 @@
     .login-step { display: none; }
     .login-step.active { display: block; }
     .login-hint { font-size: 11px; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.4; }
-    body.locked .app { visibility: hidden; }
+    body.locked .app { display: none !important; }
+    .top-actions { flex-wrap: wrap; }
+    .btn-logout {
+      background: transparent; color: #fff; border: 1px solid rgba(250,184,2,0.55);
+      border-radius: 8px; padding: 10px 12px; font: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; width: calc(100% - 28px); margin: 0 14px 14px;
+    }
+    .btn-logout:hover { background: rgba(250,184,2,0.14); color: var(--gold); }
   </style>
 </head>
 <body class="locked">
@@ -422,6 +429,7 @@
       <strong>Gulf Custody is the golden source</strong>
       Holdings, NAV, KYC approval and confirmations come from GCC. This portal is for ops, documents &amp; channel master data.
     </div>
+    <button class="btn-logout" type="button" id="logoutSideBtn">Logout</button>
   </aside>
 
   <div class="main">
@@ -431,7 +439,7 @@
         <div class="lang"><b class="on" id="langEn">English</b><b id="langAr">العربية</b></div>
         <div class="bell" title="Notifications">🔔<em>3</em></div>
         <div class="user"><div class="av" id="userAv">OA</div> <span id="userName">Operations Admin</span></div>
-        <button class="btn btn-ghost" type="button" style="padding:7px 10px;font-size:12px;" onclick="logoutAdmin()">Logout</button>
+        <button class="btn btn-navy" type="button" id="logoutTopBtn" style="padding:7px 12px;font-size:12px;">Logout</button>
       </div>
     </header>
 
@@ -1182,12 +1190,24 @@ function enterApp(displayName, role, silent) {
 }
 
 function logoutAdmin() {
-  localStorage.removeItem('adminAccessToken');
-  localStorage.removeItem('adminDisplayName');
-  localStorage.removeItem('adminRole');
-  showLoginScreen();
-  toast('Signed out');
+  try {
+    localStorage.removeItem('adminAccessToken');
+    localStorage.removeItem('adminDisplayName');
+    localStorage.removeItem('adminRole');
+    loginChallengeId = null;
+    loginUsernamePending = '';
+    showLoginScreen();
+    const otpStep = document.getElementById('loginStepOtp');
+    const passStep = document.getElementById('loginStepPassword');
+    if (otpStep) otpStep.classList.remove('active');
+    if (passStep) passStep.classList.add('active');
+    showLoginError('');
+    toast('Signed out');
+  } catch (err) {
+    alert('Logout failed: ' + err);
+  }
 }
+window.logoutAdmin = logoutAdmin;
 
 function backToPasswordLogin() {
   document.getElementById('loginStepOtp').classList.remove('active');
@@ -1630,6 +1650,10 @@ renderNotifications();
   document.getElementById('loginOtp').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submitAdminOtp();
   });
+  const topBtn = document.getElementById('logoutTopBtn');
+  const sideBtn = document.getElementById('logoutSideBtn');
+  if (topBtn) topBtn.addEventListener('click', logoutAdmin);
+  if (sideBtn) sideBtn.addEventListener('click', logoutAdmin);
   if (tplToken()) {
     enterApp(localStorage.getItem('adminDisplayName'), localStorage.getItem('adminRole'), true);
   } else {
