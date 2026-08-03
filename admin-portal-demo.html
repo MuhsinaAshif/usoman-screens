@@ -310,10 +310,93 @@
       .main { margin-left: 0; }
       .kpis { grid-template-columns: 1fr; }
     }
+
+    /* Login */
+    .login-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; align-items: center; justify-content: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(250,184,2,0.12), transparent 55%),
+        linear-gradient(145deg, #001a33 0%, #00325d 55%, #0a3d6e 100%);
+      padding: 24px;
+    }
+    .login-screen.open { display: flex; }
+    .login-card {
+      width: min(420px, 100%);
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+      border: 1px solid rgba(250,184,2,0.35);
+    }
+    .login-brand {
+      text-align: center; margin-bottom: 22px;
+    }
+    .login-brand .mark {
+      width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 12px;
+      background: #231f20; color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 26px;
+      border: 1px solid rgba(250,184,2,0.5);
+    }
+    .login-brand h1 {
+      font-size: 22px; color: var(--navy); font-weight: 700; letter-spacing: 0.02em;
+    }
+    .login-brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .login-card .modal-f { margin-bottom: 12px; }
+    .login-card .btn { width: 100%; justify-content: center; padding: 11px 14px; margin-top: 4px; }
+    .login-err {
+      display: none; font-size: 12px; color: var(--danger); background: #fef2f2;
+      border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px;
+    }
+    .login-err.show { display: block; }
+    .login-step { display: none; }
+    .login-step.active { display: block; }
+    .login-hint { font-size: 11px; color: var(--muted); margin-top: 14px; text-align: center; line-height: 1.4; }
+    body.locked .app { visibility: hidden; }
   </style>
 </head>
-<body>
-<div class="app">
+<body class="locked">
+<div class="login-screen open" id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="mark">U</div>
+      <h1>UNITED SECURITIES</h1>
+      <p>Fund Management · Admin Portal</p>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-step active" id="loginStepPassword">
+      <div class="modal-f">
+        <label>API base URL</label>
+        <input type="text" id="loginApiBase" value="http://84.54.23.29:5055" />
+      </div>
+      <div class="modal-f">
+        <label>Username</label>
+        <input type="text" id="loginUser" value="admin" autocomplete="username" />
+      </div>
+      <div class="modal-f">
+        <label>Password</label>
+        <input type="password" id="loginPass" value="Admin@123" autocomplete="current-password" />
+      </div>
+      <button class="btn btn-gold" type="button" id="loginBtn" onclick="submitAdminLogin()">Sign in</button>
+      <p class="login-hint">Uses <code>POST /api/v1/admin/auth/login</code>. If OTP is required for the user, you will be asked next.</p>
+    </div>
+    <div class="login-step" id="loginStepOtp">
+      <p style="font-size:13px;color:var(--ink);margin-bottom:12px;">
+        Enter the SMS OTP sent to the admin mobile.
+        <span id="loginOtpHint" style="display:block;margin-top:6px;color:var(--muted);font-size:12px;"></span>
+      </p>
+      <div class="modal-f">
+        <label>OTP</label>
+        <input type="text" id="loginOtp" inputmode="numeric" autocomplete="one-time-code" placeholder="1234" />
+      </div>
+      <button class="btn btn-gold" type="button" onclick="submitAdminOtp()">Verify OTP</button>
+      <button class="btn btn-ghost" type="button" style="margin-top:8px;" onclick="backToPasswordLogin()">Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appShell">
   <aside class="sidebar">
     <div class="brand">
       <div class="mark">U</div>
@@ -347,7 +430,8 @@
       <div class="top-actions">
         <div class="lang"><b class="on" id="langEn">English</b><b id="langAr">العربية</b></div>
         <div class="bell" title="Notifications">🔔<em>3</em></div>
-        <div class="user"><div class="av">OA</div> Operations Admin</div>
+        <div class="user"><div class="av" id="userAv">OA</div> <span id="userName">Operations Admin</span></div>
+        <button class="btn btn-ghost" type="button" style="padding:7px 10px;font-size:12px;" onclick="logoutAdmin()">Logout</button>
       </div>
     </header>
 
@@ -641,19 +725,7 @@
           </div>
         </div>
         <div class="api-bar">
-          <div class="modal-f">
-            <label>API base</label>
-            <input type="text" id="tplApiBase" value="http://84.54.23.29:5055" />
-          </div>
-          <div class="modal-f">
-            <label>Username</label>
-            <input type="text" id="tplUser" value="admin" />
-          </div>
-          <div class="modal-f">
-            <label>Password</label>
-            <input type="password" id="tplPass" value="Admin@123" />
-          </div>
-          <button class="btn btn-navy" type="button" onclick="loginForTemplates()">Login &amp; load</button>
+          <button class="btn btn-navy" type="button" onclick="loadNotificationTemplates()">Load from API</button>
           <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;"></span>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
@@ -1067,20 +1139,71 @@ function closeTplModal() {
   document.getElementById('tplModal').classList.remove('open');
 }
 
-function tplApiBase() {
-  return (document.getElementById('tplApiBase').value || '').replace(/\/$/, '');
+let loginChallengeId = null;
+let loginUsernamePending = '';
+
+function apiBase() {
+  const fromLogin = document.getElementById('loginApiBase');
+  const saved = localStorage.getItem('adminApiBase');
+  const value = (fromLogin && fromLogin.value) || saved || 'http://84.54.23.29:5055';
+  return String(value).replace(/\/$/, '');
 }
 
 function tplToken() {
   return localStorage.getItem('adminAccessToken') || '';
 }
 
-async function loginForTemplates() {
-  const base = tplApiBase();
-  const username = document.getElementById('tplUser').value.trim();
-  const password = document.getElementById('tplPass').value;
-  const status = document.getElementById('tplApiStatus');
-  status.textContent = 'Logging in…';
+function showLoginError(msg) {
+  const el = document.getElementById('loginErr');
+  el.textContent = msg || '';
+  el.classList.toggle('show', !!msg);
+}
+
+function showLoginScreen() {
+  document.body.classList.add('locked');
+  document.getElementById('loginScreen').classList.add('open');
+  document.getElementById('loginStepPassword').classList.add('active');
+  document.getElementById('loginStepOtp').classList.remove('active');
+  loginChallengeId = null;
+  showLoginError('');
+}
+
+function enterApp(displayName, role, silent) {
+  localStorage.setItem('adminApiBase', apiBase());
+  document.body.classList.remove('locked');
+  document.getElementById('loginScreen').classList.remove('open');
+  const name = displayName || localStorage.getItem('adminDisplayName') || 'Operations Admin';
+  const roleLabel = role || localStorage.getItem('adminRole') || 'Admin';
+  localStorage.setItem('adminDisplayName', name);
+  localStorage.setItem('adminRole', roleLabel);
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userAv').textContent = name.split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'OA';
+  if (!silent) toast('Signed in as ' + name);
+}
+
+function logoutAdmin() {
+  localStorage.removeItem('adminAccessToken');
+  localStorage.removeItem('adminDisplayName');
+  localStorage.removeItem('adminRole');
+  showLoginScreen();
+  toast('Signed out');
+}
+
+function backToPasswordLogin() {
+  document.getElementById('loginStepOtp').classList.remove('active');
+  document.getElementById('loginStepPassword').classList.add('active');
+  loginChallengeId = null;
+  showLoginError('');
+}
+
+async function submitAdminLogin() {
+  const base = apiBase();
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  showLoginError('');
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
   try {
     const res = await fetch(base + '/api/v1/admin/auth/login', {
       method: 'POST',
@@ -1089,20 +1212,59 @@ async function loginForTemplates() {
     });
     const json = await res.json();
     const data = json.data || json;
+    if (!res.ok) throw new Error(json.message || data.message || 'Invalid credentials');
+
     if (data.otpRequired) {
-      status.textContent = 'OTP required — complete verify-login-otp, then set localStorage adminAccessToken';
-      toast('Login needs OTP for this user');
+      loginChallengeId = data.challengeId;
+      loginUsernamePending = username;
+      document.getElementById('loginStepPassword').classList.remove('active');
+      document.getElementById('loginStepOtp').classList.add('active');
+      const hint = data.otp
+        ? ('Dev OTP: ' + data.otp)
+        : (data.otpExpiresAtUtc ? ('Expires ' + data.otpExpiresAtUtc) : 'Check SMS for the code');
+      document.getElementById('loginOtpHint').textContent = hint;
+      document.getElementById('loginOtp').value = data.otp || '';
+      toast('OTP required');
       return;
     }
-    if (!data.accessToken) throw new Error(json.message || 'No token');
+
+    if (!data.accessToken) throw new Error('No access token returned');
     localStorage.setItem('adminAccessToken', data.accessToken);
-    status.textContent = 'Logged in';
-    toast('Admin token saved');
-    await loadNotificationTemplates();
+    enterApp(data.displayName, data.role);
   } catch (err) {
-    status.textContent = 'Login failed — using local demo data';
-    toast(String(err.message || err));
-    renderNotifications();
+    showLoginError(String(err.message || err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+}
+
+async function submitAdminOtp() {
+  const base = apiBase();
+  const otp = document.getElementById('loginOtp').value.trim();
+  showLoginError('');
+  if (!loginChallengeId || !otp) {
+    showLoginError('Challenge and OTP are required.');
+    return;
+  }
+  try {
+    const res = await fetch(base + '/api/v1/admin/auth/verify-login-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        challengeId: loginChallengeId,
+        username: loginUsernamePending,
+        otp
+      })
+    });
+    const json = await res.json();
+    const data = json.data || json;
+    if (!res.ok) throw new Error(json.message || data.message || 'Invalid OTP');
+    if (!data.accessToken) throw new Error('No access token returned');
+    localStorage.setItem('adminAccessToken', data.accessToken);
+    enterApp(data.displayName, data.role);
+  } catch (err) {
+    showLoginError(String(err.message || err));
   }
 }
 
@@ -1115,7 +1277,7 @@ async function loadNotificationTemplates() {
     return;
   }
   try {
-    const res = await fetch(tplApiBase() + '/api/v1/admin/notification-templates', {
+    const res = await fetch(apiBase() + '/api/v1/admin/notification-templates', {
       headers: { Authorization: 'Bearer ' + token }
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1159,7 +1321,7 @@ async function saveNotificationTemplate() {
   const token = tplToken();
   if (token) {
     try {
-      const res = await fetch(tplApiBase() + '/api/v1/admin/notification-templates/' + encodeURIComponent(eventKey) + '/update', {
+      const res = await fetch(apiBase() + '/api/v1/admin/notification-templates/' + encodeURIComponent(eventKey) + '/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1458,6 +1620,22 @@ renderReports();
 renderAudit();
 renderCharts();
 renderNotifications();
+
+(function bootAuth() {
+  const savedBase = localStorage.getItem('adminApiBase');
+  if (savedBase) document.getElementById('loginApiBase').value = savedBase;
+  document.getElementById('loginPass').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitAdminLogin();
+  });
+  document.getElementById('loginOtp').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitAdminOtp();
+  });
+  if (tplToken()) {
+    enterApp(localStorage.getItem('adminDisplayName'), localStorage.getItem('adminRole'), true);
+  } else {
+    showLoginScreen();
+  }
+})();
 </script>
 </body>
 </html>
