@@ -254,6 +254,40 @@
       border-left: 4px solid var(--gold);
     }
     .toast.show { display: block; }
+    .modal-back {
+      position: fixed; inset: 0; background: rgba(0,26,51,0.45); z-index: 40;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-back.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 14px; width: min(640px, 100%); max-height: 90vh;
+      overflow: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.25); border: 1px solid var(--line);
+    }
+    .modal-h {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 16px 18px; border-bottom: 1px solid var(--line);
+    }
+    .modal-h h3 { font-size: 16px; color: var(--navy); }
+    .modal-b { padding: 16px 18px; display: grid; gap: 12px; }
+    .modal-f { display: grid; gap: 6px; }
+    .modal-f label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .modal-f input[type="text"], .modal-f textarea {
+      width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
+      font: inherit; font-size: 13px; color: var(--ink); background: #f8fafc;
+    }
+    .modal-f textarea { min-height: 72px; resize: vertical; }
+    .modal-checks { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; }
+    .modal-checks label { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ink); }
+    .modal-foot {
+      padding: 12px 18px 16px; display: flex; justify-content: flex-end; gap: 8px;
+      border-top: 1px solid var(--line);
+    }
+    .tpl-preview { font-size: 11px; color: var(--muted); max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .api-bar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 12px;
+      padding: 12px 14px; background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    }
+    .api-bar .modal-f { flex: 1; min-width: 140px; }
     .footer {
       padding: 14px 22px; color: var(--muted); font-size: 12px;
       display: flex; justify-content: space-between; border-top: 1px solid var(--line);
@@ -597,21 +631,49 @@
       <!-- NOTIFICATIONS -->
       <section class="page" id="page-notifications">
         <div class="page-h">
-          <div><h1>Notifications</h1><p>Templates aligned to BRD matrix (SMS / Email / Push).</p></div>
-          <button class="btn btn-gold" onclick="toast('Template editor (demo)')">Edit template</button>
+          <div>
+            <h1>Notifications</h1>
+            <p>Channel matrix + template content from <code>notifications.notification_templates</code>.</p>
+          </div>
+          <div class="actions">
+            <button class="btn btn-ghost" type="button" onclick="loadNotificationTemplates()">Refresh</button>
+            <button class="btn btn-gold" type="button" onclick="editNotificationTemplate(0)">Edit first</button>
+          </div>
+        </div>
+        <div class="api-bar">
+          <div class="modal-f">
+            <label>API base</label>
+            <input type="text" id="tplApiBase" value="http://84.54.23.29:5055" />
+          </div>
+          <div class="modal-f">
+            <label>Username</label>
+            <input type="text" id="tplUser" value="admin" />
+          </div>
+          <div class="modal-f">
+            <label>Password</label>
+            <input type="password" id="tplPass" value="Admin@123" />
+          </div>
+          <button class="btn btn-navy" type="button" onclick="loginForTemplates()">Login &amp; load</button>
+          <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;"></span>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
           <table>
-            <thead><tr><th style="padding-left:16px">Event</th><th>SMS</th><th>Email</th><th>In-app / Push</th><th></th></tr></thead>
-            <tbody>
-              <tr><td style="padding-left:16px">OTP</td><td>✓</td><td>—</td><td>—</td><td><a class="link" href="#" onclick="toast('Edit OTP template');return false;">Edit</a></td></tr>
-              <tr><td style="padding-left:16px">Account opening received</td><td>✓</td><td>—</td><td>—</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
-              <tr><td style="padding-left:16px">Account approved</td><td>✓</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
-              <tr><td style="padding-left:16px">Subscribe / Redeem / SIP</td><td>✓</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
-              <tr><td style="padding-left:16px">Factsheet uploaded</td><td>—</td><td>—</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
-              <tr><td style="padding-left:16px">NAV / fund update</td><td>—</td><td>✓</td><td>✓</td><td><a class="link" href="#" onclick="return false;">Edit</a></td></tr>
-            </tbody>
+            <thead>
+              <tr>
+                <th style="padding-left:16px">Event</th>
+                <th>SMS</th>
+                <th>Email</th>
+                <th>Push</th>
+                <th>Content preview</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="notifBody"></tbody>
           </table>
+        </div>
+        <div class="note-box" style="margin-top:12px;">
+          Placeholders: <code>{OTP}</code>, <code>{MINUTES}</code>, <code>{DISPLAY_NAME}</code>, <code>{FUND_NAME}</code>, <code>{NAV}</code>.
+          Saving calls <code>POST /api/v1/admin/notification-templates/{eventKey}/update</code>.
         </div>
       </section>
 
@@ -680,6 +742,51 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="modal-back" id="tplModal" onclick="if(event.target===this)closeTplModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-h">
+      <h3 id="tplModalTitle">Edit template</h3>
+      <button class="btn btn-ghost" type="button" onclick="closeTplModal()">Close</button>
+    </div>
+    <div class="modal-b">
+      <input type="hidden" id="tplEventKey" />
+      <div class="modal-f">
+        <label>Event label</label>
+        <input type="text" id="tplEventLabel" />
+      </div>
+      <div class="modal-checks">
+        <label><input type="checkbox" id="tplSms" /> SMS</label>
+        <label><input type="checkbox" id="tplEmail" /> Email</label>
+        <label><input type="checkbox" id="tplPush" /> In-app / Push</label>
+      </div>
+      <div class="modal-f">
+        <label>SMS body</label>
+        <textarea id="tplSmsBody" placeholder="Your OTP is {OTP}. Valid for {MINUTES} minutes."></textarea>
+      </div>
+      <div class="modal-f">
+        <label>Email subject</label>
+        <input type="text" id="tplEmailSubject" />
+      </div>
+      <div class="modal-f">
+        <label>Email body (HTML)</label>
+        <textarea id="tplEmailBody"></textarea>
+      </div>
+      <div class="modal-f">
+        <label>Push title</label>
+        <input type="text" id="tplPushTitle" />
+      </div>
+      <div class="modal-f">
+        <label>Push body</label>
+        <textarea id="tplPushBody"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" type="button" onclick="closeTplModal()">Cancel</button>
+      <button class="btn btn-gold" type="button" onclick="saveNotificationTemplate()">Save template</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const investors = [
@@ -799,6 +906,7 @@ function go(page) {
   });
   if (page === 'dashboard') setTimeout(renderCharts, 50);
   if (page === 'sip') renderSips();
+  if (page === 'notifications') loadNotificationTemplates();
 }
 
 function renderSips() {
@@ -893,6 +1001,204 @@ function sipAction(status) {
   }
   toast(s.id + ' → ' + status + ' (demo)');
   renderSips();
+}
+
+let notificationTemplates = [
+  { eventKey:'otp', eventLabel:'OTP', sms:true, email:false, inAppPush:false,
+    smsBody:'Your OTP is {OTP}. Valid for {MINUTES} minutes.', emailSubject:null, emailBody:null, pushTitle:null, pushBody:null },
+  { eventKey:'account_opening_received', eventLabel:'Account opening received', sms:true, email:false, inAppPush:false,
+    smsBody:'We received your account opening request. We will notify you once it is reviewed.', emailSubject:null, emailBody:null, pushTitle:null, pushBody:null },
+  { eventKey:'account_approved', eventLabel:'Account approved', sms:true, email:true, inAppPush:true,
+    smsBody:'Your United Securities account has been approved. You can now invest.',
+    emailSubject:'Account approved — United Securities',
+    emailBody:'<p>Dear {DISPLAY_NAME},</p><p>Your account has been approved.</p>',
+    pushTitle:'Account approved', pushBody:'Your account is ready. Start investing.' },
+  { eventKey:'subscribe_redeem_sip', eventLabel:'Subscribe / Redeem / SIP', sms:true, email:true, inAppPush:true,
+    smsBody:'Your {ORDER_TYPE} order {TRANSACTION_NUMBER} for {AMOUNT} {CURRENCY} is {STATUS}.',
+    emailSubject:'Order update — {ORDER_TYPE}',
+    emailBody:'<p>Your {ORDER_TYPE} order <strong>{TRANSACTION_NUMBER}</strong> is now {STATUS}.</p>',
+    pushTitle:'Order update', pushBody:'{ORDER_TYPE} {TRANSACTION_NUMBER}: {STATUS}' },
+  { eventKey:'factsheet_uploaded', eventLabel:'Factsheet uploaded', sms:false, email:false, inAppPush:true,
+    smsBody:null, emailSubject:null, emailBody:null, pushTitle:'New factsheet', pushBody:'A new factsheet is available for {FUND_NAME}.' },
+  { eventKey:'nav_fund_update', eventLabel:'NAV / fund update', sms:false, email:true, inAppPush:true,
+    smsBody:null, emailSubject:'NAV update — {FUND_NAME}',
+    emailBody:'<p>The latest NAV for {FUND_NAME} is {NAV} as of {NAV_DATE}.</p>',
+    pushTitle:'NAV update', pushBody:'{FUND_NAME} NAV: {NAV}' }
+];
+
+function mark(on) { return on ? '✓' : '—'; }
+
+function contentPreview(t) {
+  return t.smsBody || t.emailSubject || t.pushBody || t.pushTitle || '—';
+}
+
+function renderNotifications() {
+  const body = document.getElementById('notifBody');
+  if (!body) return;
+  body.innerHTML = notificationTemplates.map((t, i) => `
+    <tr>
+      <td style="padding-left:16px"><strong>${t.eventLabel}</strong><div style="font-size:11px;color:var(--muted)">${t.eventKey}</div></td>
+      <td>${mark(t.sms)}</td>
+      <td>${mark(t.email)}</td>
+      <td>${mark(t.inAppPush)}</td>
+      <td><div class="tpl-preview" title="${(contentPreview(t) || '').replace(/"/g, '&quot;')}">${contentPreview(t)}</div></td>
+      <td><a class="link" href="#" onclick="editNotificationTemplate(${i});return false;">Edit</a></td>
+    </tr>`).join('');
+}
+
+function editNotificationTemplate(index) {
+  const t = notificationTemplates[index];
+  if (!t) return;
+  document.getElementById('tplEventKey').value = t.eventKey;
+  document.getElementById('tplEventLabel').value = t.eventLabel || '';
+  document.getElementById('tplSms').checked = !!t.sms;
+  document.getElementById('tplEmail').checked = !!t.email;
+  document.getElementById('tplPush').checked = !!t.inAppPush;
+  document.getElementById('tplSmsBody').value = t.smsBody || '';
+  document.getElementById('tplEmailSubject').value = t.emailSubject || '';
+  document.getElementById('tplEmailBody').value = t.emailBody || '';
+  document.getElementById('tplPushTitle').value = t.pushTitle || '';
+  document.getElementById('tplPushBody').value = t.pushBody || '';
+  document.getElementById('tplModalTitle').textContent = 'Edit — ' + t.eventLabel;
+  document.getElementById('tplModal').classList.add('open');
+}
+
+function closeTplModal() {
+  document.getElementById('tplModal').classList.remove('open');
+}
+
+function tplApiBase() {
+  return (document.getElementById('tplApiBase').value || '').replace(/\/$/, '');
+}
+
+function tplToken() {
+  return localStorage.getItem('adminAccessToken') || '';
+}
+
+async function loginForTemplates() {
+  const base = tplApiBase();
+  const username = document.getElementById('tplUser').value.trim();
+  const password = document.getElementById('tplPass').value;
+  const status = document.getElementById('tplApiStatus');
+  status.textContent = 'Logging in…';
+  try {
+    const res = await fetch(base + '/api/v1/admin/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const json = await res.json();
+    const data = json.data || json;
+    if (data.otpRequired) {
+      status.textContent = 'OTP required — complete verify-login-otp, then set localStorage adminAccessToken';
+      toast('Login needs OTP for this user');
+      return;
+    }
+    if (!data.accessToken) throw new Error(json.message || 'No token');
+    localStorage.setItem('adminAccessToken', data.accessToken);
+    status.textContent = 'Logged in';
+    toast('Admin token saved');
+    await loadNotificationTemplates();
+  } catch (err) {
+    status.textContent = 'Login failed — using local demo data';
+    toast(String(err.message || err));
+    renderNotifications();
+  }
+}
+
+async function loadNotificationTemplates() {
+  const status = document.getElementById('tplApiStatus');
+  const token = tplToken();
+  if (!token) {
+    if (status) status.textContent = 'Demo data (login to load from API)';
+    renderNotifications();
+    return;
+  }
+  try {
+    const res = await fetch(tplApiBase() + '/api/v1/admin/notification-templates', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const rows = json.data || json;
+    if (!Array.isArray(rows) || !rows.length) throw new Error('Empty list');
+    notificationTemplates = rows.map(r => ({
+      eventKey: r.eventKey,
+      eventLabel: r.eventLabel,
+      sms: !!r.sms,
+      email: !!r.email,
+      inAppPush: !!r.inAppPush,
+      smsBody: r.smsBody,
+      emailSubject: r.emailSubject,
+      emailBody: r.emailBody,
+      pushTitle: r.pushTitle,
+      pushBody: r.pushBody
+    }));
+    if (status) status.textContent = 'Loaded from API (' + notificationTemplates.length + ')';
+    renderNotifications();
+  } catch (err) {
+    if (status) status.textContent = 'API unavailable — showing local data';
+    renderNotifications();
+  }
+}
+
+async function saveNotificationTemplate() {
+  const eventKey = document.getElementById('tplEventKey').value;
+  const payload = {
+    eventLabel: document.getElementById('tplEventLabel').value.trim(),
+    sms: document.getElementById('tplSms').checked,
+    email: document.getElementById('tplEmail').checked,
+    inAppPush: document.getElementById('tplPush').checked,
+    smsBody: document.getElementById('tplSmsBody').value,
+    emailSubject: document.getElementById('tplEmailSubject').value,
+    emailBody: document.getElementById('tplEmailBody').value,
+    pushTitle: document.getElementById('tplPushTitle').value,
+    pushBody: document.getElementById('tplPushBody').value
+  };
+  const idx = notificationTemplates.findIndex(t => t.eventKey === eventKey);
+  const token = tplToken();
+  if (token) {
+    try {
+      const res = await fetch(tplApiBase() + '/api/v1/admin/notification-templates/' + encodeURIComponent(eventKey) + '/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || ('HTTP ' + res.status));
+      const data = json.data || json;
+      if (idx >= 0) {
+        notificationTemplates[idx] = {
+          eventKey: data.eventKey || eventKey,
+          eventLabel: data.eventLabel,
+          sms: !!data.sms,
+          email: !!data.email,
+          inAppPush: !!data.inAppPush,
+          smsBody: data.smsBody,
+          emailSubject: data.emailSubject,
+          emailBody: data.emailBody,
+          pushTitle: data.pushTitle,
+          pushBody: data.pushBody
+        };
+      }
+      renderNotifications();
+      closeTplModal();
+      toast('Template saved to database');
+      return;
+    } catch (err) {
+      toast('Save failed: ' + (err.message || err));
+      return;
+    }
+  }
+  if (idx >= 0) {
+    notificationTemplates[idx] = { ...notificationTemplates[idx], ...payload, eventKey };
+    renderNotifications();
+    closeTplModal();
+    toast('Saved locally (demo — login to persist to DB)');
+  }
 }
 
 document.getElementById('nav').addEventListener('click', (e) => {
@@ -1151,6 +1457,7 @@ renderDocs();
 renderReports();
 renderAudit();
 renderCharts();
+renderNotifications();
 </script>
 </body>
 </html>

@@ -875,16 +875,16 @@
             <div class="nav">Settings</div>
           </div>
           <div class="main">
-            <div class="main-h"><h4>Notification templates</h4><span class="btn-g">Edit template</span></div>
+            <div class="main-h"><h4>Notification templates</h4><span class="btn-g">Edit content</span></div>
             <table class="data">
-              <thead><tr><th>Event</th><th>SMS</th><th>Email</th><th>In-app / Push</th></tr></thead>
+              <thead><tr><th>Event</th><th>SMS</th><th>Email</th><th>Push</th><th>Content</th></tr></thead>
               <tbody>
-                <tr><td>OTP</td><td>✓</td><td>—</td><td>—</td></tr>
-                <tr><td>Account opening received</td><td>✓</td><td>—</td><td>—</td></tr>
-                <tr><td>Account approved</td><td>✓</td><td>✓</td><td>✓</td></tr>
-                <tr><td>Subscribe / Redeem / SIP</td><td>✓</td><td>✓</td><td>✓</td></tr>
-                <tr><td>Factsheet uploaded</td><td>—</td><td>—</td><td>✓</td></tr>
-                <tr><td>NAV / fund update</td><td>—</td><td>✓</td><td>✓</td></tr>
+                <tr><td>OTP</td><td>✓</td><td>—</td><td>—</td><td>Your OTP is {OTP}…</td></tr>
+                <tr><td>Account opening received</td><td>✓</td><td>—</td><td>—</td><td>We received your…</td></tr>
+                <tr><td>Account approved</td><td>✓</td><td>✓</td><td>✓</td><td>SMS + email + push bodies</td></tr>
+                <tr><td>Subscribe / Redeem / SIP</td><td>✓</td><td>✓</td><td>✓</td><td>Order update templates</td></tr>
+                <tr><td>Factsheet uploaded</td><td>—</td><td>—</td><td>✓</td><td>New factsheet for {FUND_NAME}</td></tr>
+                <tr><td>NAV / fund update</td><td>—</td><td>✓</td><td>✓</td><td>NAV update — {FUND_NAME}</td></tr>
               </tbody>
             </table>
           </div>
@@ -892,12 +892,12 @@
       </div>
       <div class="desc">
         <h3>9. Notifications</h3>
-        <p>Admin maintains EN/AR templates aligned to the BRD notification matrix.</p>
+        <p>Admin maintains channel flags and message content in <code>notification_templates</code>.</p>
         <ul>
-          <li>Edit wording and channels</li>
-          <li>Factsheet publish → Push to investors</li>
+          <li>Edit SMS / email / push wording (placeholders like {OTP})</li>
+          <li>Toggle channels per event; save via admin API</li>
         </ul>
-        <div class="feel">Look &amp; feel: Matrix table matching the BRD channels.</div>
+        <div class="feel">Look &amp; feel: Matrix table + content editor modal.</div>
       </div>
     </div>
   </div>
