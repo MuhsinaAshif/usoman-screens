@@ -423,26 +423,24 @@
       <button data-page="funds"><span class="ico">◆</span> Funds</button>
       <button data-page="documents"><span class="ico">▤</span> Documents</button>
       <button data-page="reports"><span class="ico">▥</span> Reports</button>
-      <button data-page="notifications"><span class="ico">🔔</span> Notifications<span class="dot"></span></button>
-      <button data-page="integration"><span class="ico">☁</span> Integration Health</button>
+      <button data-page="notifications"><span class="ico">🔔</span> Notifications</button>
+      <button data-page="integration"><span class="ico">☁</span> Integration</button>
       <button data-page="audit"><span class="ico">☰</span> Audit Logs</button>
       <button data-page="settings"><span class="ico">⚙</span> Settings</button>
     </nav>
     <div class="side-card">
       <strong>Gulf Custody is the golden source</strong>
-      Holdings, NAV, KYC approval and confirmations come from GCC. This portal is for ops, documents &amp; channel master data.
+      Holdings, NAV and KYC approval come from GCC. This portal is for operations and channel data.
     </div>
     <button class="btn-logout" type="button" id="logoutSideBtn">Logout</button>
   </aside>
 
   <div class="main">
     <header class="topbar">
-      <div class="search">🔍 <input id="globalSearch" placeholder="Search investors, transactions, funds..." /></div>
+      <div class="search">Search investors, transactions, funds…</div>
       <div class="top-actions">
-        <div class="lang"><b class="on" id="langEn">English</b><b id="langAr">العربية</b></div>
-        <div class="bell" title="Notifications">🔔<em>3</em></div>
         <div class="user"><div class="av" id="userAv">OA</div> <span id="userName">Operations Admin</span></div>
-        <button class="btn btn-navy" type="button" id="logoutTopBtn" style="padding:7px 12px;font-size:12px;">Logout</button>
+        <button class="btn btn-ghost" type="button" id="logoutTopBtn" style="padding:7px 12px;font-size:12px;">Logout</button>
       </div>
     </header>
 
@@ -575,28 +573,26 @@
         <div class="kpis">
           <div class="kpi"><div class="l">Active SIPs</div><div class="v" id="sipKpiActive">0</div><div class="d">Running on schedule</div></div>
           <div class="kpi"><div class="l">Paused</div><div class="v" id="sipKpiPaused">0</div><div class="d">No new debits</div></div>
+          <div class="kpi"><div class="l">Pending</div><div class="v" id="sipKpiPending" style="color:var(--gold-dark)">0</div><div class="d">Awaiting activation</div></div>
           <div class="kpi"><div class="l">Due today</div><div class="v" id="sipKpiDue">0</div><div class="d">Next collection window</div></div>
-          <div class="kpi"><div class="l">Failed last run</div><div class="v" id="sipKpiFailed">0</div><div class="d">Needs ops follow-up</div></div>
         </div>
-        <div class="filters">
-          <select id="sipStatus">
-            <option value="">All statuses</option>
-            <option>Active</option>
-            <option>Paused</option>
-            <option>Cancelled</option>
-            <option>Completed</option>
-          </select>
-          <select id="sipFund">
-            <option value="">All funds</option>
-            <option>United GCC Fund</option>
-            <option>United US Markets Fund</option>
-          </select>
-          <select id="sipFreq">
-            <option value="">All frequencies</option>
-            <option>Monthly</option>
-            <option>Weekly</option>
-            <option>Quarterly</option>
-          </select>
+        <div class="filters" style="justify-content:space-between">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select id="sipStatus">
+              <option value="">All statuses</option>
+              <option>Active</option>
+              <option>Pending</option>
+              <option>Paused</option>
+              <option>Cancelled</option>
+              <option>Completed</option>
+            </select>
+            <select id="sipFund">
+              <option value="">All funds</option>
+              <option>United GCC Fund</option>
+              <option>United US Markets Fund</option>
+            </select>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">Frequency: Monthly only · Failed last run: <span id="sipKpiFailed">0</span></div>
         </div>
         <div class="invest-layout">
           <div class="card" style="padding:0;overflow:hidden;">
@@ -687,12 +683,17 @@
           </div>
         </div>
         <div class="filters">
-          <select><option>01 Jul 2026 – 29 Jul 2026</option></select>
+          <select>
+            <option>Month to date</option>
+            <option>Last 30 days</option>
+            <option>Year to date</option>
+          </select>
           <select><option>All Funds</option><option>United GCC Fund</option><option>United US Markets Fund</option></select>
           <div class="seg">
-            <button class="on" type="button">Consolidated</button>
+            <button class="on" type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">Consolidated</button>
             <button type="button" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">Fund-wise</button>
           </div>
+          <button class="btn btn-ghost" type="button" onclick="toast('Reports refreshed (demo)')">Refresh</button>
         </div>
         <div class="report-grid" id="reportGrid"></div>
         <div class="grid-2">
@@ -707,17 +708,19 @@
           <div class="card">
             <h3>Integration Health</h3>
             <div class="health-list">
+              <div class="health-item"><span>Overall</span><span class="pill ok">Healthy</span></div>
               <div class="health-item"><span>GCC API (Gulf Custody)</span><span class="pill ok">Healthy</span></div>
               <div class="health-item"><span>PostgreSQL Database</span><span class="pill ok">Healthy</span></div>
               <div class="health-item"><span>Payment Gateway</span><span class="pill ok">Healthy</span></div>
               <div class="health-item"><span>SMS / Email</span><span class="pill warn">Degraded</span></div>
             </div>
+            <a class="link" href="#" style="margin-top:10px;display:inline-block" onclick="go('integration');return false;">Open Integration Health →</a>
           </div>
         </div>
         <div class="card" style="margin-top:14px;padding:0;overflow:hidden;">
           <div style="padding:14px 16px;font-weight:700;color:var(--navy);">Exceptions</div>
           <table>
-            <thead><tr><th style="padding-left:16px">Reference</th><th>Type</th><th>Channel Amt</th><th>GCC Amt</th><th>Variance</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th style="padding-left:16px">Reference</th><th>Type</th><th>Channel Amt</th><th>GCC Amt</th><th>Variance</th><th>Status</th></tr></thead>
             <tbody id="excBody"></tbody>
           </table>
         </div>
@@ -785,10 +788,10 @@
 
       <!-- AUDIT -->
       <section class="page" id="page-audit">
-        <div class="page-h"><div><h1>Audit Logs</h1><p>Immutable admin and system actions.</p></div></div>
+        <div class="page-h"><div><h1>Audit Logs</h1><p>Recent admin and system activity.</p></div></div>
         <div class="card" style="padding:0;overflow:hidden;">
           <table>
-            <thead><tr><th style="padding-left:16px">Time</th><th>User</th><th>Action</th><th>Entity</th><th>Source</th></tr></thead>
+            <thead><tr><th style="padding-left:16px">Time</th><th>User</th><th>Action</th><th>Entity</th><th>Source</th><th>Result</th><th>Details</th></tr></thead>
             <tbody id="auditBody"></tbody>
           </table>
         </div>
@@ -796,28 +799,43 @@
 
       <!-- SETTINGS -->
       <section class="page" id="page-settings">
-        <div class="page-h"><div><h1>Settings &amp; reference data</h1><p>Channel config and GCC Excel reference lists.</p></div></div>
-        <div class="card" style="padding:0;overflow:hidden;">
-          <table>
-            <thead><tr><th style="padding-left:16px">Master list</th><th>Source</th><th>Admin action</th></tr></thead>
-            <tbody>
-              <tr><td style="padding-left:16px">Currencies / ISO codes</td><td>GCC Excel — ISO Codes</td><td><a class="link" href="#" onclick="toast('ISO list (demo)');return false;">View</a></td></tr>
-              <tr><td style="padding-left:16px">Stock exchanges</td><td>GCC Excel — ISO Codes</td><td>View</td></tr>
-              <tr><td style="padding-left:16px">Title / Gender / Residence / Customer type</td><td>Client On Boarding sheet</td><td>Maintain mapping</td></tr>
-              <tr><td style="padding-left:16px">Cut-off times</td><td>Channel config</td><td><a class="link" href="#" onclick="go('funds');return false;">Edit in Funds</a></td></tr>
-              <tr><td style="padding-left:16px">Notification templates</td><td>BRD matrix</td><td><a class="link" href="#" onclick="go('notifications');return false;">Open</a></td></tr>
-              <tr><td style="padding-left:16px">Staff users &amp; roles</td><td>Admin</td><td>Manage (demo)</td></tr>
-            </tbody>
-          </table>
+        <div class="page-h"><div><h1>Settings</h1><p>Master data and staff users.</p></div></div>
+        <div class="grid-2">
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 16px 0"><h3 style="margin:0">Master data</h3><p style="margin:6px 0 0;font-size:12px;color:var(--muted)">Select a list to view and maintain codes.</p></div>
+            <table>
+              <thead><tr><th style="padding-left:16px">Master list</th><th>Items</th><th></th></tr></thead>
+              <tbody>
+                <tr><td style="padding-left:16px"><b>Currencies</b><div style="font-size:11px;color:var(--muted)">currencies</div></td><td>34</td><td><button class="btn btn-ghost" onclick="toast('Open currencies (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Exchanges</b><div style="font-size:11px;color:var(--muted)">exchanges</div></td><td>27</td><td><button class="btn btn-ghost" onclick="toast('Open exchanges (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Nationalities</b><div style="font-size:11px;color:var(--muted)">nationalities</div></td><td>249</td><td><button class="btn btn-ghost" onclick="toast('Open nationalities (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Titles</b><div style="font-size:11px;color:var(--muted)">titles</div></td><td>8</td><td><button class="btn btn-ghost" onclick="toast('Open titles (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Genders</b><div style="font-size:11px;color:var(--muted)">genders</div></td><td>3</td><td><button class="btn btn-ghost" onclick="toast('Open genders (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Residence</b><div style="font-size:11px;color:var(--muted)">residence</div></td><td>3</td><td><button class="btn btn-ghost" onclick="toast('Open residence (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Customer types</b><div style="font-size:11px;color:var(--muted)">customer-types</div></td><td>3</td><td><button class="btn btn-ghost" onclick="toast('Open customer types (demo)')">Open</button></td></tr>
+                <tr><td style="padding-left:16px"><b>Account types</b><div style="font-size:11px;color:var(--muted)">account-types</div></td><td>2</td><td><button class="btn btn-ghost" onclick="toast('Open account types (demo)')">Open</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:16px 16px 0"><h3 style="margin:0">Staff users</h3></div>
+            <table>
+              <thead><tr><th style="padding-left:16px">Username</th><th>Name</th><th>Role</th><th>OTP</th><th>Active</th></tr></thead>
+              <tbody>
+                <tr><td style="padding-left:16px">admin</td><td>Operations Admin</td><td>Admin</td><td>Off</td><td>Yes</td></tr>
+                <tr><td style="padding-left:16px">ops</td><td>Ops User</td><td>Operations</td><td>Required</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="note-box">
-          Demo only — no live GCC calls. Theme inspired by usoman.com and the United Securities Fund Management admin mockups.
+        <div class="note-box" style="margin-top:14px">
+          Static HTML demo aligned to the Angular admin portal UI. Live data comes from the .NET API.
         </div>
       </section>
     </div>
 
     <footer class="footer">
-      <span>© 2026 United Securities LLC · Admin Portal Demo</span>
+      <span>© 2026 United Securities LLC · Admin Portal Demo · matches Angular portal</span>
       <b>Gulf Custody is the golden source</b>
     </footer>
   </div>
@@ -938,30 +956,38 @@ const sips = [
   },
   {
     id: 'SIP-1004', inv: 'Fatima Al-Lawati', mobile: '+968 9333 4411', fund: 'United GCC Fund',
-    amount: '100 OMR', freq: 'Weekly', day: null, start: '01 Mar 2026', end: '01 Jun 2026',
+    amount: '100 OMR', freq: 'Monthly', day: 1, start: '01 Mar 2026', end: '01 Jun 2026',
     next: '—', status: 'Completed', lastRun: '01 Jun 2026', lastResult: 'Success', dueToday: false,
     runs: [
       { date: '01 Jun 2026', order: 'TXN0901', result: 'Success', note: 'End date reached' },
-      { date: '25 May 2026', order: 'TXN0877', result: 'Success', note: '' }
+      { date: '01 May 2026', order: 'TXN0877', result: 'Success', note: '' }
     ]
   },
   {
     id: 'SIP-1005', inv: 'Sara Al-Balushi', mobile: '+968 9900 1122', fund: 'United US Markets Fund',
-    amount: '150 OMR', freq: 'Quarterly', day: 10, start: '10 Apr 2026', end: '—',
+    amount: '150 OMR', freq: 'Monthly', day: 10, start: '10 Apr 2026', end: '—',
     next: '—', status: 'Cancelled', lastRun: '10 Apr 2026', lastResult: 'Success', dueToday: false,
     runs: [
       { date: '10 Apr 2026', order: 'TXN0755', result: 'Success', note: 'Cancelled by investor' }
+    ]
+  },
+  {
+    id: 'SIP-1006', inv: 'Sara Al-Balushi', mobile: '+968 9900 1122', fund: 'United GCC Fund',
+    amount: '250 OMR', freq: 'Monthly', day: 20, start: '20 Aug 2026', end: '—',
+    next: '20 Aug 2026', status: 'Pending', lastRun: '—', lastResult: 'Scheduled', dueToday: false,
+    runs: [
+      { date: '20 Aug 2026', order: '—', result: 'Scheduled', note: 'Awaiting mandate activation' }
     ]
   }
 ];
 let selectedSip = 0;
 
 const audits = [
-  { t:'29 Jul 15:02', u:'fatima@usoman.com', a:'Published document', e:'E71 Factsheet', s:'Admin' },
-  { t:'29 Jul 14:40', u:'fatima@usoman.com', a:'Updated cut-off', e:'E59 → 12:00', s:'Admin' },
-  { t:'29 Jul 14:02', u:'system', a:'NAV sync', e:'E71, E59', s:'GCC' },
-  { t:'29 Jul 13:55', u:'system', a:'Order submitted', e:'TXN1012', s:'Mobile BFF' },
-  { t:'29 Jul 11:10', u:'ops@usoman.com', a:'Exported report', e:'Subscriptions MTD', s:'Admin' },
+  { t:'29 Jul 15:02', u:'fatima@usoman.com', a:'Published document', e:'E71 Factsheet', s:'Admin', r:'Success', d:'Factsheet v Jul 2026' },
+  { t:'29 Jul 14:40', u:'fatima@usoman.com', a:'Updated cut-off', e:'E59 → 12:00', s:'Admin', r:'Success', d:'Cut-off saved' },
+  { t:'29 Jul 14:02', u:'system', a:'NAV sync', e:'E71, E59', s:'GCC', r:'Success', d:'2 funds updated' },
+  { t:'29 Jul 13:55', u:'system', a:'Order submitted', e:'TXN1012', s:'Mobile BFF', r:'Success', d:'Queued for GCC' },
+  { t:'29 Jul 11:10', u:'ops@usoman.com', a:'Exported report', e:'Subscriptions MTD', s:'Admin', r:'Success', d:'CSV download' },
 ];
 
 function pill(status) {
@@ -994,14 +1020,13 @@ function go(page) {
 function renderSips() {
   const st = document.getElementById('sipStatus').value;
   const fund = document.getElementById('sipFund').value;
-  const freq = document.getElementById('sipFreq').value;
   const rows = sips.filter(s =>
     (!st || s.status === st) &&
-    (!fund || s.fund === fund) &&
-    (!freq || s.freq === freq)
+    (!fund || s.fund === fund)
   );
   document.getElementById('sipKpiActive').textContent = sips.filter(s => s.status === 'Active').length;
   document.getElementById('sipKpiPaused').textContent = sips.filter(s => s.status === 'Paused').length;
+  document.getElementById('sipKpiPending').textContent = sips.filter(s => s.status === 'Pending').length;
   document.getElementById('sipKpiDue').textContent = sips.filter(s => s.dueToday && s.status === 'Active').length;
   document.getElementById('sipKpiFailed').textContent = sips.filter(s => s.lastResult === 'Failed').length;
 
@@ -1582,30 +1607,28 @@ function publishDoc() {
 
 function renderReports() {
   const items = [
-    ['Subscriptions & Redemptions', 'Order volume and status for the period'],
-    ['Investor Holdings', 'Units and values from Unit Holder Statement'],
-    ['SIP Collections', 'Recurring debit runs and outcomes'],
-    ['Payment Reconciliation', 'Channel payments vs settlement'],
-    ['Gulf Custody Reconciliation', 'App orders vs GCC confirmations'],
-    ['Notification Delivery', 'SMS / Email / Push success rates'],
+    ['⇄', 'Subscriptions & Redemptions', 'Order volume and status for the period'],
+    ['☺', 'Investor Holdings', 'Units and values from Unit Holder Statement'],
+    ['↻', 'SIP Collections', 'Recurring debit runs and outcomes'],
+    ['¤', 'Payment Reconciliation', 'Channel payments vs settlement'],
+    ['☁', 'Gulf Custody Reconciliation', 'App orders vs GCC confirmations'],
+    ['✉', 'Notification Delivery', 'SMS / Email / Push success rates'],
   ];
-  document.getElementById('reportGrid').innerHTML = items.map(([t,d]) => `
+  document.getElementById('reportGrid').innerHTML = items.map(([ico,t,d]) => `
     <div class="report-card">
-      <div class="icon">▥</div>
+      <div class="icon">${ico}</div>
       <h4>${t}</h4>
       <p>${d}</p>
       <div class="report-actions">
         <button class="btn btn-navy" onclick="toast('PDF generated (demo): ${t}')">PDF</button>
         <button class="btn btn-ghost" onclick="toast('CSV generated (demo): ${t}')">CSV</button>
-        <button class="btn btn-ghost" onclick="toast('Schedule saved (demo)')">Schedule</button>
       </div>
     </div>`).join('');
   document.getElementById('excBody').innerHTML = exceptions.map(e => `
     <tr>
-      <td style="padding-left:16px">${e.ref}</td><td>${e.type}</td>
+      <td style="padding-left:16px"><b>${e.ref}</b></td><td>${e.type}</td>
       <td>${e.ch}</td><td>${e.gcc}</td><td>${e.var}</td>
       <td>${pill(e.status)}</td>
-      <td><a class="link" href="#" onclick="toast('Exception detail ${e.ref}');return false;">View</a></td>
     </tr>`).join('');
 }
 
@@ -1613,6 +1636,7 @@ function renderAudit() {
   document.getElementById('auditBody').innerHTML = audits.map(a => `
     <tr>
       <td style="padding-left:16px">${a.t}</td><td>${a.u}</td><td>${a.a}</td><td>${a.e}</td><td>${a.s}</td>
+      <td>${pill(a.r)}</td><td style="color:var(--muted)">${a.d || '—'}</td>
     </tr>`).join('');
 }
 
@@ -1657,12 +1681,6 @@ document.getElementById('txType').addEventListener('change', renderTx);
 document.getElementById('txStatus').addEventListener('change', renderTx);
 document.getElementById('sipStatus').addEventListener('change', renderSips);
 document.getElementById('sipFund').addEventListener('change', renderSips);
-document.getElementById('sipFreq').addEventListener('change', renderSips);
-document.getElementById('globalSearch').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { go('investors'); document.getElementById('invSearch').value = e.target.value; renderInvestors(); }
-});
-document.getElementById('langEn').onclick = () => { document.getElementById('langEn').classList.add('on'); document.getElementById('langAr').classList.remove('on'); toast('Language: English'); };
-document.getElementById('langAr').onclick = () => { document.getElementById('langAr').classList.add('on'); document.getElementById('langEn').classList.remove('on'); toast('Language: العربية (demo)'); };
 
 const dz = document.getElementById('dropzone');
 const fileInput = document.getElementById('docFile');
