@@ -739,7 +739,7 @@
           </div>
         </div>
         <div class="api-bar">
-          <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;">Signed-in templates load automatically.</span>
+          <span id="tplApiStatus" style="font-size:12px;color:var(--muted);align-self:center;">Demo mode — sample templates only (no live API).</span>
         </div>
         <div class="card" style="padding:0;overflow:hidden;">
           <table>
@@ -1177,38 +1177,13 @@ function closeTplModal() {
 let loginChallengeId = null;
 let loginUsernamePending = '';
 
-const ADMIN_API_BASE = 'http://84.54.23.29:5055';
+/** Static demo only — no live API calls from GitHub Pages. */
+const DEMO_USER = 'admin';
+const DEMO_PASS = 'Admin@123';
+const DEMO_OTP = '123456';
 
-function apiBase() {
-  return ADMIN_API_BASE;
-}
-
-function tplToken() {
-  return localStorage.getItem('adminAccessToken') || '';
-}
-
-function friendlyLoginError(raw) {
-  const msg = String(raw || '').toLowerCase();
-  if (!raw) return 'Something went wrong. Please try again.';
-  if (msg.includes('failed to fetch') || msg.includes('network')) {
-    return 'Unable to reach the server. Check your connection and try again.';
-  }
-  if (msg.includes('invalid') && (msg.includes('credential') || msg.includes('password') || msg.includes('username'))) {
-    return 'Incorrect username or password.';
-  }
-  if (msg.includes('invalid') && msg.includes('otp')) {
-    return 'That code is incorrect or has expired. Please try again.';
-  }
-  if (msg.includes('locked')) {
-    return 'This account is temporarily locked. Please try again later.';
-  }
-  if (msg.includes('disabled')) {
-    return 'Admin login is currently unavailable.';
-  }
-  if (msg.includes('mobile')) {
-    return 'A mobile number is required for verification. Please contact your administrator.';
-  }
-  return String(raw);
+function isDemoLoggedIn() {
+  return localStorage.getItem('adminDemoSession') === '1';
 }
 
 function showLoginError(msg) {
@@ -1238,15 +1213,17 @@ function enterApp(displayName, role, silent) {
   document.getElementById('loginScreen').classList.remove('open');
   const name = displayName || localStorage.getItem('adminDisplayName') || 'Operations Admin';
   const roleLabel = role || localStorage.getItem('adminRole') || 'Admin';
+  localStorage.setItem('adminDemoSession', '1');
   localStorage.setItem('adminDisplayName', name);
   localStorage.setItem('adminRole', roleLabel);
   document.getElementById('userName').textContent = name;
   document.getElementById('userAv').textContent = name.split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'OA';
-  if (!silent) toast('Signed in as ' + name);
+  if (!silent) toast('Signed in as ' + name + ' (demo)');
 }
 
 function logoutAdmin() {
   try {
+    localStorage.removeItem('adminDemoSession');
     localStorage.removeItem('adminAccessToken');
     localStorage.removeItem('adminDisplayName');
     localStorage.removeItem('adminRole');
@@ -1268,12 +1245,12 @@ window.logoutAdmin = logoutAdmin;
 function backToPasswordLogin() {
   document.getElementById('loginStepOtp').classList.remove('active');
   document.getElementById('loginStepPassword').classList.add('active');
+  document.getElementById('loginWelcome').textContent = 'Welcome back. Sign in to continue.';
   loginChallengeId = null;
   showLoginError('');
 }
 
-async function submitAdminLogin() {
-  const base = apiBase();
+function submitAdminLogin() {
   const username = document.getElementById('loginUser').value.trim();
   const password = document.getElementById('loginPass').value;
   showLoginError('');
@@ -1281,47 +1258,23 @@ async function submitAdminLogin() {
     showLoginError('Please enter your username and password.');
     return;
   }
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-  try {
-    const res = await fetch(base + '/api/v1/admin/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const json = await res.json().catch(() => ({}));
-    const data = json.data || json;
-    if (!res.ok) throw new Error(json.message || data.message || 'Invalid credentials');
-
-    if (data.otpRequired) {
-      loginChallengeId = data.challengeId;
-      loginUsernamePending = username;
-      document.getElementById('loginWelcome').textContent = 'Almost there';
-      document.getElementById('loginStepPassword').classList.remove('active');
-      document.getElementById('loginStepOtp').classList.add('active');
-      document.getElementById('loginOtpHint').textContent = data.otp
-        ? ('For testing, your code is ' + data.otp)
-        : 'Enter the code from your SMS message.';
-      document.getElementById('loginOtp').value = data.otp || '';
-      document.getElementById('loginOtp').focus();
-      toast('Enter the verification code');
-      return;
-    }
-
-    if (!data.accessToken) throw new Error('Sign-in did not complete. Please try again.');
-    localStorage.setItem('adminAccessToken', data.accessToken);
-    enterApp(data.displayName, data.role);
-  } catch (err) {
-    showLoginError(friendlyLoginError(err.message || err));
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Sign in';
+  if (username !== DEMO_USER || password !== DEMO_PASS) {
+    showLoginError('Incorrect username or password.');
+    return;
   }
+  // Demo OTP step (local only — no API)
+  loginChallengeId = 'demo-challenge';
+  loginUsernamePending = username;
+  document.getElementById('loginWelcome').textContent = 'Almost there';
+  document.getElementById('loginStepPassword').classList.remove('active');
+  document.getElementById('loginStepOtp').classList.add('active');
+  document.getElementById('loginOtpHint').textContent = 'For testing, your code is ' + DEMO_OTP;
+  document.getElementById('loginOtp').value = DEMO_OTP;
+  document.getElementById('loginOtp').focus();
+  toast('Enter the verification code');
 }
 
-async function submitAdminOtp() {
-  const base = apiBase();
+function submitAdminOtp() {
   const otp = document.getElementById('loginOtp').value.trim();
   showLoginError('');
   if (!otp) {
@@ -1333,70 +1286,20 @@ async function submitAdminOtp() {
     backToPasswordLogin();
     return;
   }
-  const btn = document.getElementById('otpBtn');
-  btn.disabled = true;
-  btn.textContent = 'Checking…';
-  try {
-    const res = await fetch(base + '/api/v1/admin/auth/verify-login-otp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        challengeId: loginChallengeId,
-        username: loginUsernamePending,
-        otp
-      })
-    });
-    const json = await res.json().catch(() => ({}));
-    const data = json.data || json;
-    if (!res.ok) throw new Error(json.message || data.message || 'Invalid OTP');
-    if (!data.accessToken) throw new Error('Sign-in did not complete. Please try again.');
-    localStorage.setItem('adminAccessToken', data.accessToken);
-    enterApp(data.displayName, data.role);
-  } catch (err) {
-    showLoginError(friendlyLoginError(err.message || err));
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Continue';
-  }
-}
-
-async function loadNotificationTemplates() {
-  const status = document.getElementById('tplApiStatus');
-  const token = tplToken();
-    if (!token) {
-    if (status) status.textContent = 'Showing sample templates. Sign in to load live data.';
-    renderNotifications();
+  if (otp !== DEMO_OTP) {
+    showLoginError('That code is incorrect or has expired. Please try again.');
     return;
   }
-  try {
-    const res = await fetch(apiBase() + '/api/v1/admin/notification-templates', {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const rows = json.data || json;
-    if (!Array.isArray(rows) || !rows.length) throw new Error('Empty list');
-    notificationTemplates = rows.map(r => ({
-      eventKey: r.eventKey,
-      eventLabel: r.eventLabel,
-      sms: !!r.sms,
-      email: !!r.email,
-      inAppPush: !!r.inAppPush,
-      smsBody: r.smsBody,
-      emailSubject: r.emailSubject,
-      emailBody: r.emailBody,
-      pushTitle: r.pushTitle,
-      pushBody: r.pushBody
-    }));
-    if (status) status.textContent = 'Loaded from API (' + notificationTemplates.length + ')';
-    renderNotifications();
-  } catch (err) {
-    if (status) status.textContent = 'API unavailable — showing local data';
-    renderNotifications();
-  }
+  enterApp('Operations Admin', 'Admin');
 }
 
-async function saveNotificationTemplate() {
+function loadNotificationTemplates() {
+  const status = document.getElementById('tplApiStatus');
+  if (status) status.textContent = 'Demo mode — sample templates only (no live API).';
+  renderNotifications();
+}
+
+function saveNotificationTemplate() {
   const eventKey = document.getElementById('tplEventKey').value;
   const payload = {
     eventLabel: document.getElementById('tplEventLabel').value.trim(),
@@ -1410,48 +1313,11 @@ async function saveNotificationTemplate() {
     pushBody: document.getElementById('tplPushBody').value
   };
   const idx = notificationTemplates.findIndex(t => t.eventKey === eventKey);
-  const token = tplToken();
-  if (token) {
-    try {
-      const res = await fetch(apiBase() + '/api/v1/admin/notification-templates/' + encodeURIComponent(eventKey) + '/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token
-        },
-        body: JSON.stringify(payload)
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.message || ('HTTP ' + res.status));
-      const data = json.data || json;
-      if (idx >= 0) {
-        notificationTemplates[idx] = {
-          eventKey: data.eventKey || eventKey,
-          eventLabel: data.eventLabel,
-          sms: !!data.sms,
-          email: !!data.email,
-          inAppPush: !!data.inAppPush,
-          smsBody: data.smsBody,
-          emailSubject: data.emailSubject,
-          emailBody: data.emailBody,
-          pushTitle: data.pushTitle,
-          pushBody: data.pushBody
-        };
-      }
-      renderNotifications();
-      closeTplModal();
-      toast('Template saved to database');
-      return;
-    } catch (err) {
-      toast('Save failed: ' + (err.message || err));
-      return;
-    }
-  }
   if (idx >= 0) {
     notificationTemplates[idx] = { ...notificationTemplates[idx], ...payload, eventKey };
     renderNotifications();
     closeTplModal();
-    toast('Saved locally (demo — login to persist to DB)');
+    toast('Saved locally (demo)');
   }
 }
 
@@ -1717,7 +1583,7 @@ renderNotifications();
   const sideBtn = document.getElementById('logoutSideBtn');
   if (topBtn) topBtn.addEventListener('click', logoutAdmin);
   if (sideBtn) sideBtn.addEventListener('click', logoutAdmin);
-  if (tplToken()) {
+  if (isDemoLoggedIn()) {
     enterApp(localStorage.getItem('adminDisplayName'), localStorage.getItem('adminRole'), true);
   } else {
     showLoginScreen();
