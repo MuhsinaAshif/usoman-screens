@@ -391,17 +391,7 @@
       </div>
       <label class="login-showpass"><input type="checkbox" id="loginShowPass" onchange="toggleLoginPassword()" /> Show password</label>
       <button class="btn btn-gold" type="button" id="loginBtn" onclick="submitAdminLogin()">Sign in</button>
-      <p class="login-hint">Need help? Contact your system administrator.</p>
-    </div>
-    <div class="login-step" id="loginStepOtp">
-      <p class="login-welcome" style="margin-bottom:12px;">We sent a one-time code to your registered mobile number.</p>
-      <p id="loginOtpHint" class="login-hint" style="margin:0 0 14px;text-align:left;"></p>
-      <div class="modal-f">
-        <label for="loginOtp">One-time code</label>
-        <input type="text" id="loginOtp" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 4–6 digit code" maxlength="8" />
-      </div>
-      <button class="btn btn-gold" type="button" id="otpBtn" onclick="submitAdminOtp()">Continue</button>
-      <button class="btn btn-ghost" type="button" style="margin-top:8px;" onclick="backToPasswordLogin()">Use a different account</button>
+      <p class="login-hint">Demo login: <b>admin</b> / <b>Admin@123</b> (hardcoded · no API)</p>
     </div>
   </div>
 </div>
@@ -1174,17 +1164,11 @@ function closeTplModal() {
   document.getElementById('tplModal').classList.remove('open');
 }
 
-let loginChallengeId = null;
-let loginUsernamePending = '';
-
-/** Static demo only — no live API calls from GitHub Pages. */
+/** Fully hardcoded static demo — no APIs, no OTP, no remote calls. */
 const DEMO_USER = 'admin';
 const DEMO_PASS = 'Admin@123';
-const DEMO_OTP = '123456';
-
-function isDemoLoggedIn() {
-  return localStorage.getItem('adminDemoSession') === '1';
-}
+const DEMO_NAME = 'Operations Admin';
+const DEMO_ROLE = 'Admin';
 
 function showLoginError(msg) {
   const el = document.getElementById('loginErr');
@@ -1201,54 +1185,26 @@ function toggleLoginPassword() {
 function showLoginScreen() {
   document.body.classList.add('locked');
   document.getElementById('loginScreen').classList.add('open');
-  document.getElementById('loginStepPassword').classList.add('active');
-  document.getElementById('loginStepOtp').classList.remove('active');
   document.getElementById('loginWelcome').textContent = 'Welcome back. Sign in to continue.';
-  loginChallengeId = null;
   showLoginError('');
 }
 
-function enterApp(displayName, role, silent) {
+function enterApp(silent) {
   document.body.classList.remove('locked');
   document.getElementById('loginScreen').classList.remove('open');
-  const name = displayName || localStorage.getItem('adminDisplayName') || 'Operations Admin';
-  const roleLabel = role || localStorage.getItem('adminRole') || 'Admin';
-  localStorage.setItem('adminDemoSession', '1');
-  localStorage.setItem('adminDisplayName', name);
-  localStorage.setItem('adminRole', roleLabel);
-  document.getElementById('userName').textContent = name;
-  document.getElementById('userAv').textContent = name.split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'OA';
-  if (!silent) toast('Signed in as ' + name + ' (demo)');
+  document.getElementById('userName').textContent = DEMO_NAME;
+  document.getElementById('userAv').textContent = 'OA';
+  if (!silent) toast('Signed in as ' + DEMO_NAME + ' (hardcoded demo)');
 }
 
 function logoutAdmin() {
-  try {
-    localStorage.removeItem('adminDemoSession');
-    localStorage.removeItem('adminAccessToken');
-    localStorage.removeItem('adminDisplayName');
-    localStorage.removeItem('adminRole');
-    loginChallengeId = null;
-    loginUsernamePending = '';
-    showLoginScreen();
-    const otpStep = document.getElementById('loginStepOtp');
-    const passStep = document.getElementById('loginStepPassword');
-    if (otpStep) otpStep.classList.remove('active');
-    if (passStep) passStep.classList.add('active');
-    showLoginError('');
-    toast('Signed out');
-  } catch (err) {
-    alert('Logout failed: ' + err);
-  }
+  showLoginScreen();
+  document.getElementById('loginUser').value = DEMO_USER;
+  document.getElementById('loginPass').value = DEMO_PASS;
+  showLoginError('');
+  toast('Signed out');
 }
 window.logoutAdmin = logoutAdmin;
-
-function backToPasswordLogin() {
-  document.getElementById('loginStepOtp').classList.remove('active');
-  document.getElementById('loginStepPassword').classList.add('active');
-  document.getElementById('loginWelcome').textContent = 'Welcome back. Sign in to continue.';
-  loginChallengeId = null;
-  showLoginError('');
-}
 
 function submitAdminLogin() {
   const username = document.getElementById('loginUser').value.trim();
@@ -1262,40 +1218,12 @@ function submitAdminLogin() {
     showLoginError('Incorrect username or password.');
     return;
   }
-  // Demo OTP step (local only — no API)
-  loginChallengeId = 'demo-challenge';
-  loginUsernamePending = username;
-  document.getElementById('loginWelcome').textContent = 'Almost there';
-  document.getElementById('loginStepPassword').classList.remove('active');
-  document.getElementById('loginStepOtp').classList.add('active');
-  document.getElementById('loginOtpHint').textContent = 'For testing, your code is ' + DEMO_OTP;
-  document.getElementById('loginOtp').value = DEMO_OTP;
-  document.getElementById('loginOtp').focus();
-  toast('Enter the verification code');
-}
-
-function submitAdminOtp() {
-  const otp = document.getElementById('loginOtp').value.trim();
-  showLoginError('');
-  if (!otp) {
-    showLoginError('Please enter the code sent to your mobile.');
-    return;
-  }
-  if (!loginChallengeId) {
-    showLoginError('Your session expired. Please sign in again.');
-    backToPasswordLogin();
-    return;
-  }
-  if (otp !== DEMO_OTP) {
-    showLoginError('That code is incorrect or has expired. Please try again.');
-    return;
-  }
-  enterApp('Operations Admin', 'Admin');
+  enterApp(false);
 }
 
 function loadNotificationTemplates() {
   const status = document.getElementById('tplApiStatus');
-  if (status) status.textContent = 'Demo mode — sample templates only (no live API).';
+  if (status) status.textContent = 'Hardcoded demo templates (no API).';
   renderNotifications();
 }
 
@@ -1317,7 +1245,7 @@ function saveNotificationTemplate() {
     notificationTemplates[idx] = { ...notificationTemplates[idx], ...payload, eventKey };
     renderNotifications();
     closeTplModal();
-    toast('Saved locally (demo)');
+    toast('Updated in memory (hardcoded demo)');
   }
 }
 
@@ -1576,18 +1504,11 @@ renderNotifications();
   document.getElementById('loginPass').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submitAdminLogin();
   });
-  document.getElementById('loginOtp').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') submitAdminOtp();
-  });
   const topBtn = document.getElementById('logoutTopBtn');
   const sideBtn = document.getElementById('logoutSideBtn');
   if (topBtn) topBtn.addEventListener('click', logoutAdmin);
   if (sideBtn) sideBtn.addEventListener('click', logoutAdmin);
-  if (isDemoLoggedIn()) {
-    enterApp(localStorage.getItem('adminDisplayName'), localStorage.getItem('adminRole'), true);
-  } else {
-    showLoginScreen();
-  }
+  showLoginScreen();
 })();
 </script>
 </body>
